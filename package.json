@@ -1,0 +1,19 @@
+{
+  "name": "readingexperience",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mohanrajoria/ReadingExperience.git"
+  },
+  "author": "Mahone",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mohanrajoria/ReadingExperience/issues"
+  },
+  "homepage": "https://github.com/mohanrajoria/ReadingExperience#readme"
+}
