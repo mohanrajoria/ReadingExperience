@@ -1,0 +1,50 @@
+#chapter-parent-container {
+    height: 100vh;
+    max-height: 100vh;
+    min-height: 100vh;
+    overflow-y: scroll;
+}
+
+#chapter-parent-container .chapter-container {
+    /*height: 300px;*/
+    background-color: orange;
+    border: 1px solid green;
+}
+
+#chapter-parent-container .chapter-container .segment-container {
+    height: 100px;
+    background-color: pink;
+    border: 1px solid #4d4d4d;
+}
+
+/** Chapter content styling **/
+
+.chapter-heading {
+    color: #FF4646;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+/** Chapter content styling ends here **/
+
+/** custom scroll bar */
+#chapter-parent-container::-webkit-scrollbar-track
+{
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	border-radius: 4px;
+	background-color: #e4e4e4;
+}
+
+#chapter-parent-container::-webkit-scrollbar
+{
+	width: 0px;
+	background-color: #e4e4e4;
+}
+
+#chapter-parent-container::-webkit-scrollbar-thumb
+{
+	border-radius: 4px;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	background-color: #4d4d4d;
+}
+/** Custom scrollbar ends here **/

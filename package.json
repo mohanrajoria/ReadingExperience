@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/mohanrajoria/ReadingExperience/issues"
   },
-  "homepage": "https://github.com/mohanrajoria/ReadingExperience#readme"
+  "homepage": "https://github.com/mohanrajoria/ReadingExperience#readme",
+  "dependencies": {
+    "bootstrap": "^3.3.7"
+  }
 }
