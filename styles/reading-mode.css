@@ -20,15 +20,32 @@
 .chapter-heading {
     color: #FF4646;
     font-size: 24px;
-    font-weight: 700;
+    font-weight: 500;
 }
-
 .chapter-segment-placeholder {
     background-image: url("../images/segment_placeholder.png");
     background-repeat: no-repeat;
-    background-position: 0% 50%;
+    /*background-position: 50% 50%;*/
     height: 400px;
     /*margin: 0 auto !important;*/
+}
+.chapter-heading-container .chapter-name{
+    font-size: 26px;
+    color: #FF4646;
+}
+.chapter-segment-container p {
+    margin-bottom: 15px;
+    color: #333;
+    font-family: "Charter",sans-serif;
+    font-size: 20px;
+    line-height: 26px;
+}
+.chapter-segment-container p {
+    font-size: 18px;
+    line-height: 27px;
+}
+.chapter-segment-container {
+    padding: 0px 70px;
 }
 
 /** Chapter content styling ends here **/
