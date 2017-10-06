@@ -71,3 +71,23 @@
 	background-color: #4d4d4d;
 }
 /** Custom scrollbar ends here **/
+
+#page-loading-container{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    text-align: center;
+    z-index:99;
+    background-color: white;
+    padding-top: 25%;
+}
+
+#page-loading-container img{
+    width: 40px;
+    height: 40px;
+}
+
+#page-loading-container.in-active{
+    display: none;
+}

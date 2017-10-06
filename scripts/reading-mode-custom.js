@@ -1,6 +1,7 @@
+pageLoading('show');
 var __BASE_URL__ = "https://app.juggernaut.in/";
 var __USER_ID__ = "3783332750f049d897092288d1566f6c";
-var __BOOK_ID__ = "00572208a2e742f397f7e082aa40ae2e";
+var __BOOK_ID__ = "1bbad3af1be8408eadc998ff3c141ce9";
 var __AUTH_TOKEN__ = "451dcb0916904a0caadab926a96a1944";
 
 var _loaded_segment_ids_ = [];
@@ -9,10 +10,10 @@ var _fetching_segment_ids_ = [];
 var _fetching_page_numbers_ = [];
 
 $(document).ready(function() {
-    $("#init-reading-btn").on('click', function(e) {
+    // $("#init-reading-btn").on('click', function(e) {
         getChapters(formatReadDetails);
         bindChapterContainerScrollEnd(scrollEndCallBack);
-    })
+    // })
 })
 
 function bindChapterContainerScrollEnd(callBack) {
@@ -218,6 +219,7 @@ function insertPages(data) {
             }
             updateArray([pageNumber], _fetching_page_numbers_, 'pop');
         })
+        pageLoading('hide');
     } else {
         // todo : woooooo
     }
@@ -226,16 +228,15 @@ function insertPages(data) {
 function updateLastReadLocation(data) {
     var pageNumber = data.last_read_page;
     var pageNumbersToFetch;
+    var selector = '#chapter-parent-container', scrollTop;
     if(pageNumber) {
-        var selectorString = "div[data-page-number='" + pageNumber + "']";
-        var dataObj = {
-            selectorString : selectorString
-        }
+        scrollTop = $("div[data-page-number='" + pageNumber + "']").position().top;
         pageNumbersToFetch = [pageNumber-1, pageNumber, pageNumber+1];
     } else {
         pageNumbersToFetch = [1, 2, 3];
     }
-    scrollToGivenElement(dataObj);
+
+    scrollToGivenElement({selector : selector, scrollTop : scrollTop});
 
     var nonRepeatedPageNumbers = pageNumbersToFetch.map(function(n, i) {
         if(_fetching_page_numbers_.indexOf(n) === -1) return n;
@@ -392,11 +393,15 @@ function scrollToGivenPosition() {
 }
 
 function scrollToGivenElement(data) {
-    var selector = data.selectorString;
-    // if(data.selectorType === 'id') {
-    //     selector = "#" + data.selector;
-    // }
-    $(selector).animate({
-        scrollTop : $(selector).offset().top
-    })
+    var selector = data.selector;
+    var pos = data.scrollTop;
+    $(selector).scrollTop(pos);
+}
+
+function pageLoading(action) {
+    if(action === 'show') {
+        $('#page-loading-container').removeClass('in-active');
+    } else if(action === 'hide') {
+        $('#page-loading-container').addClass('in-active');
+    }
 }
