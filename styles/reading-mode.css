@@ -25,7 +25,7 @@
 .chapter-segment-placeholder {
     background-image: url("../images/segment_placeholder.png");
     background-repeat: no-repeat;
-    /*background-position: 50% 50%;*/
+    background-position: 50% 50%;
     height: 400px;
     /*margin: 0 auto !important;*/
 }
@@ -44,8 +44,8 @@
     font-size: 18px;
     line-height: 27px;
 }
-.chapter-segment-container {
-    padding: 0px 70px;
+.chapter-segment-container, .chapter-heading-container{
+    padding: 0px 20px;
 }
 
 /** Chapter content styling ends here **/
