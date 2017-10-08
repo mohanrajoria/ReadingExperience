@@ -1,3 +1,9 @@
+// todo : break view port logic
+        // todo : find cid of first element
+        // todo : ajax url and request handler normalization
+        // todo : maintain Viweport content on line height change and font size change
+        // todo : toc
+        // filhaal toh ita hi hai...
 pageLoading('show');
 var __BASE_URL__ = "https://app.juggernaut.in/";
 var __USER_ID__ = "3783332750f049d897092288d1566f6c";
@@ -8,14 +14,116 @@ var _loaded_segment_ids_ = [];
 var _loaded_page_numbers_ = [];
 var _fetching_segment_ids_ = [];
 var _fetching_page_numbers_ = [];
-var _maxPageNumber_ = 1;
+var _max_page_number_ = 1;
+var _visible_viewport_element_obj_ = {
+    visibleFirstElement : {
+        pageNumber : '',
+        cId : '',
+        topOffset : ''
+    },
+    scrollPosition : ''
+}
 
 $(document).ready(function() {
     // $("#init-reading-btn").on('click', function(e) {
         getChapters(formatReadDetails);
         bindChapterContainerScrollEnd(scrollEndCallBack);
     // })
+
+    $('.font-size-update').on('click', function(e) {
+        var sizeAttr = 'data-font-size';
+        var fontSize = e.target.getAttribute(sizeAttr);
+        if(fontSize){
+            saveCurrentScrollAndFirstElement(_visible_viewport_element_obj_);
+            modifyFontSize(fontSize);
+            maintainVisibleViewportContentsPosition(_visible_viewport_element_obj_);
+        }
+    })
+
+    $('.line-height-update').on('click', function(e) {
+        var sizeAttr = 'data-line-height';
+        var lineHeight = e.target.getAttribute(sizeAttr);
+        if(lineHeight) {
+            saveCurrentScrollAndFirstElement(_visible_viewport_element_obj_);
+            modifyLineHeight(lineHeight);
+            maintainVisibleViewportContentsPosition(_visible_viewport_element_obj_);
+        }
+    })
+
+    function modifyLineHeight(lineHeight) {
+        var obj = {
+            selector : '.chapter-segment-container p',
+            styles : {
+                'line-height' : lineHeight
+            }
+        }
+        modifyStyleOfSelectors(obj);
+    }
+
+    function modifyFontSize(fontSize) {
+        var obj = {
+            selector : '.chapter-segment-container p',
+            styles : {
+                'font-size' : fontSize
+            }
+        }
+        modifyStyleOfSelectors(obj);
+    }
 })
+
+function saveCurrentScrollAndFirstElement(dataObj) {
+    var windowScroll = $('#chapter-parent-container').scrollTop(),
+        visibleFirstElementDetail = topMostContentIdInViewport();
+
+    if(!dataObj) return;
+
+    if(dataObj.visibleFirstElement) {
+        dataObj.visibleFirstElement['pageNumber'] = visibleFirstElementDetail['pageNumber'];
+        dataObj.visibleFirstElement['cId'] = visibleFirstElementDetail['cId'];
+        dataObj.visibleFirstElement['topOffset'] = visibleFirstElementDetail['topOffset'];
+    }
+    dataObj.visibleFirstElement = windowScroll;
+}
+
+function maintainVisibleViewportContentsPosition(dataObj) {
+    var parentContainerSelector = '#chapter-parent-container',
+        currentWindowScroll = getScrollPosition({selector : parentContainerSelector}),
+        visibleFirstElementDetail = dataObj.visibleFirstElement,
+        previewWindowScroll = dataObj.scrollPosition,
+        cId = visibleFirstElementDetail.cId,
+        pageNumber = visibleFirstElementDetail.pageNumber,
+        firstVisibleElementSelector = "div[data-page-number='" + pageNumber + "'] #" + cId,
+
+        firstElementOffsetPrevious = visibleFirstElementDetail.topOffset,
+        firstElementOffsetCurrent = $(firstVisibleElementSelector).offset().top,
+        windowScrollPositionToUpdate;
+
+        if(firstElementOffsetPrevious > firstElementOffsetCurrent) {
+            var diff = firstElementOffsetPrevious - firstElementOffsetCurrent;
+            windowScrollPositionToUpdate = currentWindowScroll - diff;
+
+        } else if(firstElementOffsetPrevious < firstElementOffsetCurrent) {
+            var diff = firstElementOffsetPrevious - firstElementOffsetCurrent;
+            windowScrollPositionToUpdate = currentWindowScroll - diff;
+        }
+
+        scrollToGivenElement({selector : parentContainerSelector, scrollTop : windowScrollPositionToUpdate});
+
+}
+
+function getScrollPosition(dataObj) {
+    var selector = dataObj.selector;
+    if(selector)
+        return $(selector).scrollTop();
+}
+
+function modifyStyleOfSelectors(dataObj) {
+    var selector = dataObj.selector;
+    var style = dataObj.styles;
+
+    $(selector).css(style);
+
+}
 
 /** Binding scroll end event in reading main container***/
 function bindChapterContainerScrollEnd(callBack) {
@@ -34,23 +142,26 @@ function bindChapterContainerScrollEnd(callBack) {
 
 /** This will initiate getting pages call **/
 function scrollEndCallBack(e) {
-    var segmentIds = getSegmentsInViewPort();
-    var nonRepeatedPageNumbers = segmentIds.filter(function(n, i) {
+    var viewportVisibleContentInfo = getSegmentsInViewPort();
+    var pageNumberList = viewportVisibleContentInfo ? viewportVisibleContentInfo.pageNumberList : [];
+
+    var nonRepeatedPageNumbers = pageNumberList.filter(function(n, i) {
         return (_fetching_page_numbers_.indexOf(n) === -1);
     });
 
     updateArray(nonRepeatedPageNumbers, _fetching_page_numbers_, 'push');
     getSegments(nonRepeatedPageNumbers, formatPagesDetail);
+
+    saveCurrentScrollAndFirstElement(_visible_viewport_element_obj_);
 }
 
 /** Finding elements in viewport **/
 function getSegmentsInViewPort() {
-    var chapterElems = $(".chapter-container");
-    var chapterParentContainerScrollPos = $('#chapter-parent-container').scrollTop();
-    var windowHeight = window.innerHeight;
-    var startPageNumber;
-    var startChapterNumber;
-    var pageNumberList = [];
+    var chapterElems = $(".chapter-container"),
+        chapterParentContainerScrollPos = $('#chapter-parent-container').scrollTop(),
+        windowHeight = window.innerHeight, startPageNumber, startChapterNumber, firstVisiblePage,
+        pageNumberList = [],
+        cont = true;
 
     for(var i = 0; i < chapterElems.length; i++) {
         var chapterScrollPos = $(chapterElems[i]).offset().top + chapterParentContainerScrollPos;
@@ -65,17 +176,19 @@ function getSegmentsInViewPort() {
         }
     }
 
-    var cont = true;
     while(cont) {
-        if(!startPageNumber || (startPageNumber > _maxPageNumber_)) {
+        if(!startPageNumber || (startPageNumber > _max_page_number_)) {
             cont = false;
         } else {
-            var ele = $("div[data-page-number='"+startPageNumber+"']");
-            var scrollPos = $(ele).offset().top + chapterParentContainerScrollPos;
-            var isLoaded = $(ele).hasClass('is-loaded');
+            var ele = $("div[data-page-number='"+startPageNumber+"']"),
+                scrollPos = $(ele).offset().top + chapterParentContainerScrollPos,
+                isLoaded = $(ele).hasClass('is-loaded');
+
             if(scrollPos >= chapterParentContainerScrollPos && scrollPos <= chapterParentContainerScrollPos + windowHeight) {
-                if(!isLoaded)
+                if(!isLoaded) {
+                    firstVisiblePage = firstVisiblePage ? firstVisiblePage : startPageNumber;
                     pageNumberList.push(startPageNumber)
+                }
             } else if(scrollPos > chapterParentContainerScrollPos + windowHeight){
                 if(!isLoaded)
                     pageNumberList.push(startPageNumber)
@@ -87,13 +200,48 @@ function getSegmentsInViewPort() {
 
     if(pageNumberList.length > 0) {
         var prevNumber = pageNumberList[0] - 1;
-        // var nextNumber = pageNumberList[pageNumberList.length - 1] + 1;
-
         if(prevNumber && prevNumber > 0 && pageNumberList.indexOf(prevNumber) === -1) pageNumberList.push(prevNumber);
-        // if(nextNumber && nextNumber > 0 && pageNumberList.indexOf(nextNumber) === -1) pageNumberList.push(nextNumber);
+    }
+    return {pageNumberList : pageNumberList, firstVisiblePage : firstVisiblePage};
+}
+
+function topMostContentIdInViewport() {
+    var chapterParentContainerScrollPos = $('#chapter-parent-container').scrollTop(),
+        windowHeight = window.innerHeight;
+        viewportVisibleContentInfo = getSegmentsInViewPort(),
+        pageNumberList = viewportVisibleContentInfo ? viewportVisibleContentInfo.pageNumberList : [],
+        firstVisiblePageNumber = '',
+        firstVisibleCId = '';
+
+    pageNumberList.sort();
+
+    for(var i = 0; i < pageNumberList.length; i++) {
+        var pNo = pageNumberList[i],
+            ele = $("div[data-page-number='"+pNo+"']"),
+            cTags = ele.find('c'),
+            topOffset;
+
+        for(var j = 0; j < cTags.length; j++) {
+            var cTag = cTags[j],
+                cOffset = $(cTag).offset().top,
+                scrollPos = cOffset + chapterParentContainerScrollPos;
+
+            if(scrollPos >= chapterParentContainerScrollPos && scrollPos <= chapterParentContainerScrollPos + windowHeight) {
+                firstVisiblePageNumber = pNo;
+                firstVisibleCId = $(cTag).attr('id');
+                topOffset = cOffset;
+                break;
+            }
+        }
+
+        if(firstVisiblePageNumber && firstVisibleCId) break;
     }
 
-    return pageNumberList;
+    return {
+        pageNumber : firstVisiblePageNumber,
+        cId : firstVisibleCId,
+        topOffset : topOffset
+    }
 }
 
 /** Not in use abhi **/
@@ -323,7 +471,7 @@ function insertSinglePage(data) {
     if(data && data.pageNumber) {
         var pageHTML = singlePageContainer(data);
         $("#"+chapterId).append(pageHTML);
-        _maxPageNumber_ = data.pageNumber;
+        _max_page_number_ = data.pageNumber;
     }
 }
 
@@ -447,4 +595,14 @@ function pageLoading(action) {
     } else if(action === 'hide') {
         $('#page-loading-container').addClass('in-active');
     }
+}
+
+/** Ajax call handler **/
+function apiService(dataObj) {
+    var reqMethod = dataObj.reqMethod;
+
+}
+
+function apiURLMapper() {
+
 }
