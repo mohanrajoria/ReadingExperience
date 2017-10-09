@@ -9,46 +9,9 @@
     /*height: 300px;*/
 }
 
-#chapter-parent-container .chapter-container .segment-container {
-    height: 100px;
-    background-color: pink;
-    border: 1px solid #4d4d4d;
-}
+#chapter-parent-container .chapter-container .chapter-segment-container {
 
-/** Chapter content styling **/
-
-.chapter-heading {
-    color: #FF4646;
-    font-size: 24px;
-    font-weight: 500;
 }
-.chapter-segment-placeholder {
-    background-image: url("../images/segment_placeholder.png");
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
-    height: 400px;
-    /*margin: 0 auto !important;*/
-}
-.chapter-heading-container .chapter-name{
-    font-size: 26px;
-    color: #FF4646;
-}
-.chapter-segment-container p {
-    margin-bottom: 15px;
-    color: #333;
-    font-family: "Charter",sans-serif;
-    font-size: 20px;
-    line-height: 26px;
-}
-.chapter-segment-container p {
-    font-size: 18px;
-    line-height: 27px;
-}
-.chapter-segment-container, .chapter-heading-container{
-    padding: 0px 20px;
-}
-
-/** Chapter content styling ends here **/
 
 /** custom scroll bar */
 #chapter-parent-container::-webkit-scrollbar-track
@@ -81,6 +44,7 @@
     z-index:99;
     background-color: white;
     padding-top: 25%;
+    z-index: 99999;
 }
 
 #page-loading-container img{
@@ -90,4 +54,136 @@
 
 #page-loading-container.in-active{
     display: none;
+}
+
+/**
+**
+Chapter content styling : common text styling and formatting across themes, add below
+**
+**/
+#chapter-parent-container .chapter-segment-placeholder {
+    background-image: url("../images/segment_placeholder.png");
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    height: 400px;
+}
+
+#chapter-parent-container .chapter-segment-container,
+#chapter-parent-container .chapter-heading-container{
+    padding: 0px 20px;
+}
+
+#chapter-parent-container .chapter-heading-container{
+    margin-top: 60px;
+}
+
+#chapter-parent-container .chapter-heading-container .chapter-name{
+    font-size: 26px;
+    color: #ff4546;
+    margin-bottom: 10px;
+}
+#chapter-parent-container .chapter-heading-container .chapter-ornament{
+    width: 32px;
+    height: 10px;
+    display: inline-block;
+    margin-top: 20px;
+}
+
+#chapter-parent-container .chapter-segment-container p {
+    margin-bottom: 15px;
+    font-family: "Charter",sans-serif;
+}
+
+/*#chapter-parent-container .chapter-segment-container p {
+    font-size: 18px;
+    line-height: 27px;
+}*/
+
+
+
+
+/** Themes
+* .black-BG-theme
+* .white-BG-theme
+* .biege-BG-theme
+* .grey-BG-theme
+**/
+
+
+.black-BG-theme#chapter-parent-container{
+    background-color: rgba(77, 77, 77, 1);
+}
+.grey-BG-theme#chapter-parent-container{
+    background-color: rgba(245, 245, 245, 1);
+}
+.biege-BG-theme#chapter-parent-container{
+    background-color: rgba(255, 248, 238, 1);
+}
+.white-BG-theme#chapter-parent-container{
+    background-color: rgba(255, 255, 255, 1);
+}
+
+.black-BG-theme#chapter-parent-container p{
+    color: white;
+}
+.black-BG-theme#chapter-parent-container .chapter-heading-container .chapter-ornament{
+    background: url("../images/readimg_pase_light.png") no-repeat;
+}
+.grey-BG-theme#chapter-parent-container .chapter-heading-container .chapter-ornament,
+.white-BG-theme#chapter-parent-container .chapter-heading-container .chapter-ornament,
+.biege-BG-theme#chapter-parent-container .chapter-heading-container .chapter-ornament{
+    background: url("../images/readimg_pase_dark.png") no-repeat;
+}
+
+/** FONT-size, LINE-height
+* .line-height-medium, .line-height-small, .line-height-large
+* .font-size-medium, .font-size-small, .font-size-large
+**/
+
+.line-height-small#chapter-parent-container p{
+    line-height: 27px;
+}
+.line-height-medium#chapter-parent-container p{
+    line-height: 30px;
+}
+.line-height-large#chapter-parent-container p{
+    line-height: 33px;
+}
+
+.font-size-xsmall#chapter-parent-container p{
+    font-size: 16px;
+}
+.font-size-small#chapter-parent-container p{
+    font-size: 18px;
+}
+.font-size-medium#chapter-parent-container p{
+    font-size: 20px;
+}
+.font-size-large#chapter-parent-container p{
+    font-size: 22px;
+}
+.font-size-xlarge#chapter-parent-container p{
+    font-size: 24px;
+}
+
+@media screen and (max-width: 768px) and (min-width: 520px) {
+    #reading-layout-container{
+        margin-top: 100px;
+    }
+}
+#reading-layout-container{
+    margin-top: 70px;
+}
+#style-btn-container{
+    position: fixed;
+    top: 0px;
+    z-index: 999;
+    background-color: #e4e4e4;
+    width: auto;
+    overflow: scroll;
+    text-align: center;
+    padding: 5px 10px;
+}
+.seperate-btn-container {
+    display: inline-block;
 }

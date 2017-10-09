@@ -19,25 +19,30 @@
     </div>
     <div class = "container-fluid reading-parent-container" id = "reading-parent-container">
         <div class = "row">
-            <div class = "col-md-8 col-sm-10 col-xs-12 col-md-offset-2 col-sm-offset-1 col-xs-offset-0" id = "layout-container">
-                <div class = "BG-color-white" id = "chapter-parent-container">
+            <div class = "col-md-8 col-sm-10 col-xs-12 col-md-offset-2 col-sm-offset-1 col-xs-offset-0" id = "reading-layout-container">
+                <div class = "" id = "chapter-parent-container">
                     <!-- <div style = "height: 1px;" id = "scroll-marker"></div> -->
 
                 </div>
             </div>
-            <div class = "col-md-1 col-sm-1">
-                <div>Font size</div>
-                <button class = "btn font-size-update" data-font-size = '16px'>16px</button>
-                <button class = "btn font-size-update" data-font-size = '18px'>18px</button>
-                <button class = "btn font-size-update" data-font-size = '20px'>20px</button>
-                <button class = "btn font-size-update" data-font-size = '22px'>22px</button>
-                <button class = "btn font-size-update" data-font-size = '24px'>24px</button>
+            <div class = "col-md-6 col-md-offset-3 col-sm-10 col-sm-offset-1 col-xs-10 col-xs-offset-1" id = "style-btn-container">
+                <div class = "seperate-btn-container">
+                    <button class = "btn font-size-update" data-font-size = 'dec'>A-</button>
+                    <button class = "btn font-size-update" data-font-size = 'inc'>A+</button>
+                </div>
 
-                <div>Line height</div>
-                <button class = "btn line-height-update" data-line-height = '20px'>20px</button>
-                <button class = "btn line-height-update" data-line-height = '25px'>25px</button>
-                <button class = "btn line-height-update" data-line-height = '30px'>30px</button>
-                <button class = "btn line-height-update" data-line-height = '35px'>35px</button>
+                <div class = "seperate-btn-container">
+                    <button class = "btn line-height-update" data-line-height = 'small'>Small LH</button>
+                    <button class = "btn line-height-update" data-line-height = 'medium'>Mid LH</button>
+                    <button class = "btn line-height-update" data-line-height = 'large'>Large LH</button>
+                </div>
+
+                <div class = "seperate-btn-container">
+                    <button class = "btn background-color-update" data-background-color = 'white' style = "border:1px solid #e4e4e4;width : 80px; height:40px; background-color: white;"></button>
+                    <button class = "btn background-color-update" data-background-color = 'black' style = "border:1px solid #e4e4e4;width : 80px; height:40px; background-color: #4d4d4d;"></button>
+                    <button class = "btn background-color-update" data-background-color = 'grey' style = "border:1px solid #e4e4e4;width : 80px; height:40px; background-color: rgba(245, 245, 245, 1);"></button>
+                    <button class = "btn background-color-update" data-background-color = 'biege' style = "border:1px solid #e4e4e4;width : 80px; height:40px; background-color: rgba(255, 248, 238, 1);"></button>
+                </div>
             </div>
         </div>
     </div>

@@ -3,12 +3,95 @@
         // todo : ajax url and request handler normalization
         // todo : maintain Viweport content on line height change and font size change
         // todo : toc
+        // todo : footnotes handling
+        // todo : blockquote handling
         // filhaal toh ita hi hai...
 pageLoading('show');
 var __BASE_URL__ = "https://app.juggernaut.in/";
 var __USER_ID__ = "3783332750f049d897092288d1566f6c";
 var __BOOK_ID__ = "1bbad3af1be8408eadc998ff3c141ce9";
 var __AUTH_TOKEN__ = "451dcb0916904a0caadab926a96a1944";
+
+var _styling_classes_obj_ = {
+    'backgroundColorStyle' : {
+        classes : [
+            'black', 'white', 'grey', 'biege'
+        ],
+        prefix : '',
+        suffix : '-BG-theme',
+        activeClass : '',
+        default : 'white',
+        nextBackgroundColor : function(bgColorMidText) {
+            if(!bgColorMidText) return '';
+            if(this.classes.indexOf(bgColorMidText) === -1 && bgColorMidText != 'default') return '';
+
+            this.activeClass = (bgColorMidText === 'default') ? this.default : bgColorMidText;
+            return this.prefix + this.activeClass + this.suffix;
+        },
+        currentActiveClass : function() {
+            return this.activeClass ? this.prefix + this.activeClass + this.suffix : '';
+        }
+    },
+    'fontSizeStyle' : {
+        classes : [
+            'xsmall', 'small', 'medium', 'large', 'xlarge'
+        ],
+        prefix : 'font-size-',
+        suffix : '',
+        activeClass : '',
+        default : 'medium',
+        validModificationTypes : ['inc', 'dec'],
+        nextFontSize : function(modificationType) {
+            if(!modificationType) return '';
+            if(this.validModificationTypes.indexOf(modificationType) === -1 && modificationType != 'default') return '';
+
+            var nextClassMidStr = '',
+                classesLen = this.classes.length;
+
+            if(modificationType === 'default') {
+                nextClassMidStr = this.default;
+            } else {
+                for(var i = 0; i < classesLen; i++) {
+                    var a = this.classes[i];
+                    if(a === this.activeClass) {
+                        if(modificationType == 'inc') {
+                            nextClassMidStr = (this.classes[i + 1] ? this.classes[i + 1] : this.activeClass);
+                            break;
+                        } else if(modificationType == 'dec') {
+                            nextClassMidStr = (this.classes[i - 1] ? this.classes[i - 1] : this.activeClass);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            this.activeClass = nextClassMidStr;
+            return this.prefix + this.activeClass + this.suffix;
+        },
+        currentActiveClass : function() {
+            return this.activeClass ? this.prefix + this.activeClass + this.suffix : '';
+        }
+    },
+    'lineHeightStyle' : {
+        classes : [
+            'small', 'medium', 'large'
+        ],
+        prefix : 'line-height-',
+        suffix : '',
+        activeClass : '',
+        default : 'medium',
+        nextLineHeight : function(lineHeightMidText) {
+            if(!lineHeightMidText) return '';
+            if(this.classes.indexOf(lineHeightMidText) === -1 && lineHeightMidText != 'default') return '';
+
+            this.activeClass = (lineHeightMidText === 'default') ? this.default : lineHeightMidText;
+            return this.prefix + this.activeClass + this.suffix;
+        },
+        currentActiveClass : function() {
+            return this.activeClass ? this.prefix + this.activeClass + this.suffix : '';
+        }
+    }
+}
 
 var _loaded_segment_ids_ = [];
 var _loaded_page_numbers_ = [];
@@ -23,16 +106,18 @@ var _visible_viewport_element_obj_ = {
     },
     scrollPosition : ''
 }
+var _chapter_parent_container_selector_ = '#chapter-parent-container';
 
 $(document).ready(function() {
     // $("#init-reading-btn").on('click', function(e) {
+        getSavedUserPreferences();
         getChapters(formatReadDetails);
         bindChapterContainerScrollEnd(scrollEndCallBack);
     // })
 
     $('.font-size-update').on('click', function(e) {
-        var sizeAttr = 'data-font-size';
-        var fontSize = e.target.getAttribute(sizeAttr);
+        var fontSizeAttr = 'data-font-size';
+        var fontSize = e.target.getAttribute(fontSizeAttr);
         if(fontSize){
             saveCurrentScrollAndFirstElement(_visible_viewport_element_obj_);
             modifyFontSize(fontSize);
@@ -41,8 +126,8 @@ $(document).ready(function() {
     })
 
     $('.line-height-update').on('click', function(e) {
-        var sizeAttr = 'data-line-height';
-        var lineHeight = e.target.getAttribute(sizeAttr);
+        var lineHeightAttr = 'data-line-height';
+        var lineHeight = e.target.getAttribute(lineHeightAttr);
         if(lineHeight) {
             saveCurrentScrollAndFirstElement(_visible_viewport_element_obj_);
             modifyLineHeight(lineHeight);
@@ -50,50 +135,79 @@ $(document).ready(function() {
         }
     })
 
-    function modifyLineHeight(lineHeight) {
-        var obj = {
-            selector : '.chapter-segment-container p',
-            styles : {
-                'line-height' : lineHeight
-            }
+    $('.background-color-update').on('click', function(e) {
+        var backgroundColorAttr = 'data-background-color';
+        var backgroundColor = e.target.getAttribute(backgroundColorAttr);
+        if(backgroundColor) {
+            modifyBackgroundColor(backgroundColor);
         }
-        modifyStyleOfSelectors(obj);
-    }
-
-    function modifyFontSize(fontSize) {
-        var obj = {
-            selector : '.chapter-segment-container p',
-            styles : {
-                'font-size' : fontSize
-            }
-        }
-        modifyStyleOfSelectors(obj);
-    }
+    })
 })
 
-function saveCurrentScrollAndFirstElement(dataObj) {
-    var windowScroll = $('#chapter-parent-container').scrollTop(),
-        visibleFirstElementDetail = topMostContentIdInViewport();
+function modifyLineHeight(lineHeight) {
+    var obj = {
+        selector : _chapter_parent_container_selector_,
+        classToRemove : _styling_classes_obj_['lineHeightStyle']['currentActiveClass'](),
+        classToAdd : _styling_classes_obj_['lineHeightStyle']['nextLineHeight'](lineHeight)
+    }
+    modifyClassesForSelector(obj);
+}
+
+function modifyFontSize(fontSize) {
+    var obj = {
+        selector : _chapter_parent_container_selector_,
+        classToRemove : _styling_classes_obj_['fontSizeStyle']['currentActiveClass'](),
+        classToAdd : _styling_classes_obj_['fontSizeStyle']['nextFontSize'](fontSize),
+    }
+    modifyClassesForSelector(obj);
+}
+
+function modifyBackgroundColor(bgColor) {
+    var obj = {
+        selector : _chapter_parent_container_selector_,
+        classToRemove : _styling_classes_obj_['backgroundColorStyle']['currentActiveClass'](),
+        classToAdd : _styling_classes_obj_['backgroundColorStyle']['nextBackgroundColor'](bgColor),
+    }
+    modifyClassesForSelector(obj);
+}
+
+function modifyClassesForSelector(dataObj) {
+    var selector = dataObj.selector,
+        classToAdd = dataObj.classToAdd,
+        classToRemove = dataObj.classToRemove;
+
+    if(selector) {
+        if(classToRemove) $(selector).removeClass(classToRemove);
+        if(classToAdd) $(selector).addClass(classToAdd);
+    }
+}
+
+function saveCurrentScrollAndFirstElement(dataObj, visibleContentInViewPort) {
+    var windowScroll = $(_chapter_parent_container_selector_).scrollTop(),
+        visibleFirstElementDetail = topMostContentIdInViewport({viewportVisibleContentInfo : visibleContentInViewPort});
 
     if(!dataObj) return;
 
-    if(dataObj.visibleFirstElement) {
-        dataObj.visibleFirstElement['pageNumber'] = visibleFirstElementDetail['pageNumber'];
-        dataObj.visibleFirstElement['cId'] = visibleFirstElementDetail['cId'];
-        dataObj.visibleFirstElement['topOffset'] = visibleFirstElementDetail['topOffset'];
-    }
-    dataObj.visibleFirstElement = windowScroll;
+    dataObj.visibleFirstElement = dataObj.visibleFirstElement ? dataObj.visibleFirstElement : {};
+
+    dataObj.visibleFirstElement['pageNumber'] = visibleFirstElementDetail['pageNumber'];
+    dataObj.visibleFirstElement['cId'] = visibleFirstElementDetail['cId'];
+    dataObj.visibleFirstElement['topOffset'] = visibleFirstElementDetail['topOffset'];
+
+    dataObj.scrollPosition = windowScroll;
 }
 
 function maintainVisibleViewportContentsPosition(dataObj) {
-    var parentContainerSelector = '#chapter-parent-container',
+    var parentContainerSelector = _chapter_parent_container_selector_,
         currentWindowScroll = getScrollPosition({selector : parentContainerSelector}),
         visibleFirstElementDetail = dataObj.visibleFirstElement,
         previewWindowScroll = dataObj.scrollPosition,
         cId = visibleFirstElementDetail.cId,
-        pageNumber = visibleFirstElementDetail.pageNumber,
-        firstVisibleElementSelector = "div[data-page-number='" + pageNumber + "'] #" + cId,
+        pageNumber = visibleFirstElementDetail.pageNumber;
 
+    if(!pageNumber || !cId) return;
+
+    var firstVisibleElementSelector = _chapter_parent_container_selector_ + " div[data-page-number='" + pageNumber + "'] #" + cId,
         firstElementOffsetPrevious = visibleFirstElementDetail.topOffset,
         firstElementOffsetCurrent = $(firstVisibleElementSelector).offset().top,
         windowScrollPositionToUpdate;
@@ -137,7 +251,7 @@ function bindChapterContainerScrollEnd(callBack) {
         });
     };
 
-    $('#chapter-parent-container').scrollEnd(callBack, 10);
+    $(_chapter_parent_container_selector_).scrollEnd(callBack, 10);
 }
 
 /** This will initiate getting pages call **/
@@ -152,13 +266,13 @@ function scrollEndCallBack(e) {
     updateArray(nonRepeatedPageNumbers, _fetching_page_numbers_, 'push');
     getSegments(nonRepeatedPageNumbers, formatPagesDetail);
 
-    saveCurrentScrollAndFirstElement(_visible_viewport_element_obj_);
+    saveCurrentScrollAndFirstElement(_visible_viewport_element_obj_, viewportVisibleContentInfo);
 }
 
 /** Finding elements in viewport **/
 function getSegmentsInViewPort() {
-    var chapterElems = $(".chapter-container"),
-        chapterParentContainerScrollPos = $('#chapter-parent-container').scrollTop(),
+    var chapterElems = $(_chapter_parent_container_selector_ + " .chapter-container"),
+        chapterParentContainerScrollPos = $(_chapter_parent_container_selector_).scrollTop(),
         windowHeight = window.innerHeight, startPageNumber, startChapterNumber, firstVisiblePage,
         pageNumberList = [],
         cont = true;
@@ -180,13 +294,14 @@ function getSegmentsInViewPort() {
         if(!startPageNumber || (startPageNumber > _max_page_number_)) {
             cont = false;
         } else {
-            var ele = $("div[data-page-number='"+startPageNumber+"']"),
+            var selectorStr = _chapter_parent_container_selector_ + " div[data-page-number='"+startPageNumber+"']",
+                ele = $(selectorStr),
                 scrollPos = $(ele).offset().top + chapterParentContainerScrollPos,
                 isLoaded = $(ele).hasClass('is-loaded');
 
             if(scrollPos >= chapterParentContainerScrollPos && scrollPos <= chapterParentContainerScrollPos + windowHeight) {
+                firstVisiblePage = firstVisiblePage ? firstVisiblePage : startPageNumber;
                 if(!isLoaded) {
-                    firstVisiblePage = firstVisiblePage ? firstVisiblePage : startPageNumber;
                     pageNumberList.push(startPageNumber)
                 }
             } else if(scrollPos > chapterParentContainerScrollPos + windowHeight){
@@ -201,14 +316,26 @@ function getSegmentsInViewPort() {
     if(pageNumberList.length > 0) {
         var prevNumber = pageNumberList[0] - 1;
         if(prevNumber && prevNumber > 0 && pageNumberList.indexOf(prevNumber) === -1) pageNumberList.push(prevNumber);
+    } else {
+        var prevNumber = firstVisiblePage - 1;
+        if(prevNumber > 0) {
+            var ele = $("div[data-page-number='"+startPageNumber+"']"),
+                isLoaded = $(ele).hasClass('is-loaded');
+            if(!isLoaded)
+                pageNumberList.push(prevNumber);
+        }
     }
+
+    pageNumberList.sort();
+    firstVisiblePage = pageNumberList[0] ? pageNumberList[0] : firstVisiblePage;
+
     return {pageNumberList : pageNumberList, firstVisiblePage : firstVisiblePage};
 }
 
-function topMostContentIdInViewport() {
-    var chapterParentContainerScrollPos = $('#chapter-parent-container').scrollTop(),
-        windowHeight = window.innerHeight;
-        viewportVisibleContentInfo = getSegmentsInViewPort(),
+function topMostContentIdInViewport(dataObj) {
+    var chapterParentContainerScrollPos = $(_chapter_parent_container_selector_).scrollTop(),
+        windowHeight = window.innerHeight,
+        viewportVisibleContentInfo = dataObj.viewportVisibleContentInfo || getSegmentsInViewPort(),
         pageNumberList = viewportVisibleContentInfo ? viewportVisibleContentInfo.pageNumberList : [],
         firstVisiblePageNumber = '',
         firstVisibleCId = '';
@@ -217,7 +344,7 @@ function topMostContentIdInViewport() {
 
     for(var i = 0; i < pageNumberList.length; i++) {
         var pNo = pageNumberList[i],
-            ele = $("div[data-page-number='"+pNo+"']"),
+            ele = $(_chapter_parent_container_selector_ + " div[data-page-number='"+pNo+"']"),
             cTags = ele.find('c'),
             topOffset;
 
@@ -404,7 +531,7 @@ function insertPages(data) {
 function updateLastReadLocation(data) {
     var pageNumber = data.last_read_page;
     var pageNumbersToFetch;
-    var selector = '#chapter-parent-container', scrollTop;
+    var selector = _chapter_parent_container_selector_, scrollTop;
     if(pageNumber) {
         scrollTop = $("div[data-page-number='" + pageNumber + "']").position().top;
         pageNumbersToFetch = [pageNumber-1, pageNumber, pageNumber+1];
@@ -441,7 +568,7 @@ function insertChapters(data) {
 function insertSingleChapter(data) {
     if(data && data.chapter_id) {
         var chapterHTML = singleChapterContainer(data);
-        $("#chapter-parent-container").append(chapterHTML);
+        $(_chapter_parent_container_selector_).append(chapterHTML);
         insertPageContainer(data);
     } else {
         // todo : think what to do...
@@ -568,7 +695,27 @@ function updateImgUrlInHtml(data) {
 
 /** Not in use abhi **/
 function getSavedUserPreferences() {
+    // todo : get from server
+    // todo : get from cookies
+    // todo : udpate user preferences saved
 
+    // todo : if nothing found, set default
+
+    var dataObj = {updateUserPreferences : 'default'};
+
+    updateUserPreferences(dataObj);
+
+}
+
+function updateUserPreferences(dataObj) {
+    if(!dataObj) return;
+    if(dataObj.updateUserPreferences === 'default') {
+        modifyBackgroundColor('default');
+        modifyFontSize('default');
+        modifyLineHeight('default');
+    } else {
+
+    }
 }
 
 /** Not in use abhi **/
