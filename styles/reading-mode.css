@@ -94,10 +94,43 @@ Chapter content styling : common text styling and formatting across themes, add 
     font-family: "Charter",sans-serif;
 }
 
-/*#chapter-parent-container .chapter-segment-container p {
+#chapter-parent-container .chapter-segment-container ol, ul{
+    list-style-type: decimal;
+    list-style-position: inside;
+    padding-left: 40px;
+}
+
+#chapter-parent-container .chapter-segment-container ol li, ul li{
+    list-style-type: decimal;
+    color: #333;
+    font-family: "Charter",sans-serif;
+    /*font-size: 20px;
+    line-height: 30px;*/
+}
+
+#chapter-parent-container .chapter-segment-container img{
+    width: 100%;
+    height: auto;
+    margin: 40px 0;
+    display: block;
+}
+
+#chapter-parent-container .chapter-segment-container blockquote p {
+    color: #ff4646;
+    font-family: "Charter", sans-serif;
+    padding: 20px 100px 30px 10px;
+    font-style: italic;
+}
+#chapter-parent-container .chapter-segment-container footnote {
+    /** todo : footnote styling to be done over here **/
+}
+
+/*
+#chapter-parent-container .chapter-segment-container p {
     font-size: 18px;
     line-height: 27px;
-}*/
+}
+*/
 
 
 
@@ -123,7 +156,9 @@ Chapter content styling : common text styling and formatting across themes, add 
     background-color: rgba(255, 255, 255, 1);
 }
 
-.black-BG-theme#chapter-parent-container p{
+.black-BG-theme#chapter-parent-container p,
+.black-BG-theme#chapter-parent-container ul li,
+.black-BG-theme#chapter-parent-container ol li{
     color: white;
 }
 .black-BG-theme#chapter-parent-container .chapter-heading-container .chapter-ornament{
@@ -140,29 +175,45 @@ Chapter content styling : common text styling and formatting across themes, add 
 * .font-size-medium, .font-size-small, .font-size-large
 **/
 
-.line-height-small#chapter-parent-container p{
+.line-height-small#chapter-parent-container p,
+.line-height-small#chapter-parent-container ul li,
+.line-height-small#chapter-parent-container ol li{
     line-height: 27px;
 }
-.line-height-medium#chapter-parent-container p{
+.line-height-medium#chapter-parent-container p,
+.line-height-medium#chapter-parent-container ul li,
+.line-height-medium#chapter-parent-container ol li{
     line-height: 30px;
 }
-.line-height-large#chapter-parent-container p{
+.line-height-large#chapter-parent-container p,
+.line-height-large#chapter-parent-container ul li,
+.line-height-large#chapter-parent-container ol li{
     line-height: 33px;
 }
 
-.font-size-xsmall#chapter-parent-container p{
+.font-size-xsmall#chapter-parent-container p,
+.font-size-xsmall#chapter-parent-container ul li,
+.font-size-xsmall#chapter-parent-container ol li{
     font-size: 16px;
 }
-.font-size-small#chapter-parent-container p{
+.font-size-small#chapter-parent-container p,
+.font-size-small#chapter-parent-container ul li,
+.font-size-small#chapter-parent-container ol li{
     font-size: 18px;
 }
-.font-size-medium#chapter-parent-container p{
+.font-size-medium#chapter-parent-container p,
+.font-size-medium#chapter-parent-container ul li,
+.font-size-medium#chapter-parent-container ol li{
     font-size: 20px;
 }
-.font-size-large#chapter-parent-container p{
+.font-size-large#chapter-parent-container p,
+.font-size-large#chapter-parent-container ul li,
+.font-size-large#chapter-parent-container ol li{
     font-size: 22px;
 }
-.font-size-xlarge#chapter-parent-container p{
+.font-size-xlarge#chapter-parent-container p,
+.font-size-xlarge#chapter-parent-container ul li,
+.font-size-xlarge#chapter-parent-container ol li{
     font-size: 24px;
 }
 
@@ -172,7 +223,7 @@ Chapter content styling : common text styling and formatting across themes, add 
     }
 }
 #reading-layout-container{
-    margin-top: 70px;
+    /*margin-top: 70px;*/
 }
 #style-btn-container{
     position: fixed;

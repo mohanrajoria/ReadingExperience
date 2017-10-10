@@ -1,11 +1,13 @@
-// todo : break view port logic
-        // todo : find cid of first element
-        // todo : ajax url and request handler normalization
-        // todo : maintain Viweport content on line height change and font size change
-        // todo : toc
-        // todo : footnotes handling
-        // todo : blockquote handling
-        // filhaal toh ita hi hai...
+// done : break view port logic
+// done : find cid of first element
+// todo : ajax url and request handler normalization
+// done : maintain Viweport content on line height change and font size change
+// todo : toc
+// todo : footnotes handling
+// done : blockquote handling
+// todo : find content in viewport : login change to binary search...
+// ...filhaal toh ita hi hai...
+
 pageLoading('show');
 var __BASE_URL__ = "https://app.juggernaut.in/";
 var __USER_ID__ = "3783332750f049d897092288d1566f6c";
@@ -239,6 +241,10 @@ function modifyStyleOfSelectors(dataObj) {
 
 }
 
+function getFirstPageNumber() {
+
+}
+
 /** Binding scroll end event in reading main container***/
 function bindChapterContainerScrollEnd(callBack) {
     $.fn.scrollEnd = function(callback, timeout) {
@@ -251,7 +257,7 @@ function bindChapterContainerScrollEnd(callBack) {
         });
     };
 
-    $(_chapter_parent_container_selector_).scrollEnd(callBack, 10);
+    $(_chapter_parent_container_selector_).scrollEnd(callBack, 100);
 }
 
 /** This will initiate getting pages call **/
@@ -330,6 +336,34 @@ function getSegmentsInViewPort() {
     firstVisiblePage = pageNumberList[0] ? pageNumberList[0] : firstVisiblePage;
 
     return {pageNumberList : pageNumberList, firstVisiblePage : firstVisiblePage};
+}
+
+function getSegmentsInViewPortWithBinarySearch() {
+    var maxPageNumber = _max_page_number_,
+        allPageNumbers = new Array(maxPageNumber),
+        chapterParentContainerScrollPos = $(_chapter_parent_container_selector_).scrollTop(),
+        firstElement = 1,
+        lastElement = maxPageNumber;
+
+    var visiblePageNumbers = binarySearch(firstElement, lastElement, chapterParentContainerScrollPos);
+
+
+
+    // todo : iterate through array using binary search
+    // todo : compare with window scroll and find visible pages on viewport
+
+}
+
+function binarySearch(low, high, windowScrollPos) {
+    // todo : task is to find nearest minimum offsetTop wala element...
+    if(low >= high) {
+        return;
+    }
+
+    var mid = (low + high) / 2;
+
+
+
 }
 
 function topMostContentIdInViewport(dataObj) {
