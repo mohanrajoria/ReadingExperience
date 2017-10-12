@@ -18,6 +18,7 @@
   "homepage": "https://github.com/mohanrajoria/ReadingExperience#readme",
   "dependencies": {
     "bootstrap": "^3.3.7",
+    "in-view": "^0.6.1",
     "jquery": "^3.2.1"
   }
 }

@@ -3,6 +3,7 @@
     max-height: 100vh;
     min-height: 100vh;
     overflow-y: scroll;
+    padding : 0px;
 }
 
 #chapter-parent-container .chapter-container {
@@ -217,13 +218,17 @@ Chapter content styling : common text styling and formatting across themes, add 
     font-size: 24px;
 }
 
-@media screen and (max-width: 768px) and (min-width: 520px) {
+@media screen and (max-width: 768px){
     #reading-layout-container{
-        margin-top: 100px;
+        margin-
+        border-left: 1px solid #e4e4e4;
+        border-right: 1px solid #e4e4e4;
     }
 }
 #reading-layout-container{
-    /*margin-top: 70px;*/
+    border-left: 1px solid #e4e4e4;
+    border-right: 1px solid #e4e4e4;
+    padding: 0px;
 }
 #style-btn-container{
     position: fixed;
@@ -237,4 +242,20 @@ Chapter content styling : common text styling and formatting across themes, add 
 }
 .seperate-btn-container {
     display: inline-block;
+}
+
+#page-number-container{
+    position: relative;
+    height: 30px;
+    bottom: 30px;
+    background-color: rgba(77, 77, 77, 1);
+}
+
+#page-number-container #current-first-visible-page-number{
+    width: 50px;
+    height: 30px;
+    float: right;
+    line-height: 30px;
+    color: white;
+    text-align: center;
 }

@@ -20,9 +20,12 @@
     <div class = "container-fluid reading-parent-container" id = "reading-parent-container">
         <div class = "row">
             <div class = "col-md-8 col-sm-10 col-xs-12 col-md-offset-2 col-sm-offset-1 col-xs-offset-0" id = "reading-layout-container">
-                <div class = "" id = "chapter-parent-container">
+                <div class = "col-md-12 col-sm-12 col-xs-12" id = "chapter-parent-container">
                     <!-- <div style = "height: 1px;" id = "scroll-marker"></div> -->
 
+                </div>
+                <div class = "page-number-container col-md-12 col-sm-12 col-xs-12" id = "page-number-container">
+                    <div id = "current-first-visible-page-number"></div>
                 </div>
             </div>
             <div class = "col-md-6 col-md-offset-3 col-sm-10 col-sm-offset-1 col-xs-10 col-xs-offset-1" id = "style-btn-container">
@@ -50,6 +53,7 @@
     <!-- libs and dependencies-->
     <script type = "text/javascript" src = "/node_modules/jquery/dist/jquery.min.js"></script>
     <script type = "text/javascript" src = "/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script type = "text/javascript" src = "/node_modules/in-view/dist/in-view.min.js"></script>
 
     <!-- Services and module -->
     <script type = "text/javascript" src = "/scripts/reading-mode-custom.js"></script>

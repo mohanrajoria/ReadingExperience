@@ -115,6 +115,7 @@ $(document).ready(function() {
         getSavedUserPreferences();
         getChapters(formatReadDetails);
         bindChapterContainerScrollEnd(scrollEndCallBack);
+        bindChapterContainerOnScroll(scrollingCallBack);
     // })
 
     $('.font-size-update').on('click', function(e) {
@@ -245,6 +246,14 @@ function getFirstPageNumber() {
 
 }
 
+function scrollingCallBack(e) {
+    showPageNumber(e);
+}
+
+function bindChapterContainerOnScroll(callBack) {
+    $(_chapter_parent_container_selector_).scroll(callBack);
+}
+
 /** Binding scroll end event in reading main container***/
 function bindChapterContainerScrollEnd(callBack) {
     $.fn.scrollEnd = function(callback, timeout) {
@@ -257,17 +266,21 @@ function bindChapterContainerScrollEnd(callBack) {
         });
     };
 
-    $(_chapter_parent_container_selector_).scrollEnd(callBack, 100);
+    $(_chapter_parent_container_selector_).scrollEnd(callBack, 50);
 }
 
 /** This will initiate getting pages call **/
-function scrollEndCallBack(e) {
-    var viewportVisibleContentInfo = getSegmentsInViewPort();
+function scrollEndCallBack() {
+    // var viewportVisibleContentInfo = viewportVisibleContentInfo ? viewportVisibleContentInfo : {pageNumberList : []};
+    // var viewportVisibleContentInfo = getSegmentsInViewPort();
+    var viewportVisibleContentInfo = getSegmentsInViewPortWithBinarySearch();
     var pageNumberList = viewportVisibleContentInfo ? viewportVisibleContentInfo.pageNumberList : [];
 
     var nonRepeatedPageNumbers = pageNumberList.filter(function(n, i) {
         return (_fetching_page_numbers_.indexOf(n) === -1);
     });
+
+    if(nonRepeatedPageNumbers.length === 0) return;
 
     updateArray(nonRepeatedPageNumbers, _fetching_page_numbers_, 'push');
     getSegments(nonRepeatedPageNumbers, formatPagesDetail);
@@ -276,94 +289,159 @@ function scrollEndCallBack(e) {
 }
 
 /** Finding elements in viewport **/
-function getSegmentsInViewPort() {
-    var chapterElems = $(_chapter_parent_container_selector_ + " .chapter-container"),
-        chapterParentContainerScrollPos = $(_chapter_parent_container_selector_).scrollTop(),
-        windowHeight = window.innerHeight, startPageNumber, startChapterNumber, firstVisiblePage,
-        pageNumberList = [],
-        cont = true;
-
-    for(var i = 0; i < chapterElems.length; i++) {
-        var chapterScrollPos = $(chapterElems[i]).offset().top + chapterParentContainerScrollPos;
-        if(chapterScrollPos >= chapterParentContainerScrollPos) {
-            if(i-1 >= 0) {
-                var segments = $(chapterElems[i-1]).find(".chapter-segment-container");
-                if(segments && segments.length > 0) {
-                    startPageNumber = segments[0].getAttribute("data-page-number") * 1;
-                    break;
-                }
-            }
-        }
-    }
-
-    while(cont) {
-        if(!startPageNumber || (startPageNumber > _max_page_number_)) {
-            cont = false;
-        } else {
-            var selectorStr = _chapter_parent_container_selector_ + " div[data-page-number='"+startPageNumber+"']",
-                ele = $(selectorStr),
-                scrollPos = $(ele).offset().top + chapterParentContainerScrollPos,
-                isLoaded = $(ele).hasClass('is-loaded');
-
-            if(scrollPos >= chapterParentContainerScrollPos && scrollPos <= chapterParentContainerScrollPos + windowHeight) {
-                firstVisiblePage = firstVisiblePage ? firstVisiblePage : startPageNumber;
-                if(!isLoaded) {
-                    pageNumberList.push(startPageNumber)
-                }
-            } else if(scrollPos > chapterParentContainerScrollPos + windowHeight){
-                if(!isLoaded)
-                    pageNumberList.push(startPageNumber)
-                cont = false;
-            }
-            startPageNumber += 1;
-        }
-    }
-
-    if(pageNumberList.length > 0) {
-        var prevNumber = pageNumberList[0] - 1;
-        if(prevNumber && prevNumber > 0 && pageNumberList.indexOf(prevNumber) === -1) pageNumberList.push(prevNumber);
-    } else {
-        var prevNumber = firstVisiblePage - 1;
-        if(prevNumber > 0) {
-            var ele = $("div[data-page-number='"+startPageNumber+"']"),
-                isLoaded = $(ele).hasClass('is-loaded');
-            if(!isLoaded)
-                pageNumberList.push(prevNumber);
-        }
-    }
-
-    pageNumberList.sort();
-    firstVisiblePage = pageNumberList[0] ? pageNumberList[0] : firstVisiblePage;
-
-    return {pageNumberList : pageNumberList, firstVisiblePage : firstVisiblePage};
-}
+// function getSegmentsInViewPort() {
+//     var chapterElems = $(_chapter_parent_container_selector_ + " .chapter-container"),
+//         chapterParentContainerScrollPos = $(_chapter_parent_container_selector_).scrollTop(),
+//         windowHeight = window.innerHeight, startPageNumber, startChapterNumber, firstVisiblePage,
+//         pageNumberList = [],
+//         cont = true;
+//
+//     for(var i = 0; i < chapterElems.length; i++) {
+//         var chapterScrollPos = $(chapterElems[i]).offset().top + chapterParentContainerScrollPos;
+//         if(chapterScrollPos >= chapterParentContainerScrollPos) {
+//             if(i-1 >= 0) {
+//                 var segments = $(chapterElems[i-1]).find(".chapter-segment-container");
+//                 if(segments && segments.length > 0) {
+//                     startPageNumber = segments[0].getAttribute("data-page-number") * 1;
+//                     break;
+//                 }
+//             }
+//         }
+//     }
+//
+//     while(cont) {
+//         if(!startPageNumber || (startPageNumber > _max_page_number_)) {
+//             cont = false;
+//         } else {
+//             var selectorStr = _chapter_parent_container_selector_ + " div[data-page-number='"+startPageNumber+"']",
+//                 ele = $(selectorStr),
+//                 scrollPos = $(ele).offset().top + chapterParentContainerScrollPos,
+//                 isLoaded = $(ele).hasClass('is-loaded');
+//
+//             if(scrollPos >= chapterParentContainerScrollPos && scrollPos <= chapterParentContainerScrollPos + windowHeight) {
+//                 firstVisiblePage = firstVisiblePage ? firstVisiblePage : startPageNumber;
+//                 if(!isLoaded) {
+//                     pageNumberList.push(startPageNumber)
+//                 }
+//             } else if(scrollPos > chapterParentContainerScrollPos + windowHeight){
+//                 if(!isLoaded)
+//                     pageNumberList.push(startPageNumber)
+//                 cont = false;
+//             }
+//             startPageNumber += 1;
+//         }
+//     }
+//
+//     if(pageNumberList.length > 0) {
+//         var prevNumber = pageNumberList[0] - 1;
+//         if(prevNumber && prevNumber > 0 && pageNumberList.indexOf(prevNumber) === -1) pageNumberList.push(prevNumber);
+//     } else {
+//         var prevNumber = firstVisiblePage - 1;
+//         if(prevNumber > 0) {
+//             var ele = $("div[data-page-number='"+startPageNumber+"']"),
+//                 isLoaded = $(ele).hasClass('is-loaded');
+//             if(!isLoaded)
+//                 pageNumberList.push(prevNumber);
+//         }
+//     }
+//
+//     pageNumberList.sort();
+//     firstVisiblePage = pageNumberList[0] ? pageNumberList[0] : firstVisiblePage;
+//
+//     return {pageNumberList : pageNumberList, firstVisiblePage : firstVisiblePage};
+// }
 
 function getSegmentsInViewPortWithBinarySearch() {
-    var maxPageNumber = _max_page_number_,
-        allPageNumbers = new Array(maxPageNumber),
-        chapterParentContainerScrollPos = $(_chapter_parent_container_selector_).scrollTop(),
+    var chapterParentContainerScrollPos = $(_chapter_parent_container_selector_).scrollTop(),
         firstElement = 1,
-        lastElement = maxPageNumber;
+        lastElement = _max_page_number_,
+        visiblePageNumbers = [],
+        chapterElems = $(_chapter_parent_container_selector_ + " .chapter-container"),
+        chapterParentContainerScrollPos = $(_chapter_parent_container_selector_).scrollTop(),
+        firstVisiblePageNumber = binarySearch(firstElement, lastElement, chapterParentContainerScrollPos),
+        windowHeight = window.innerHeight;
 
-    var visiblePageNumbers = binarySearch(firstElement, lastElement, chapterParentContainerScrollPos);
+    if(!firstVisiblePageNumber) return;
 
+    for(var i = firstVisiblePageNumber; i <= _max_page_number_; i++) {
+        var ele = $('div[data-page-number="'+i+'"]'),
+            offsetTop = ele.offset().top
+            isLoaded = ele.hasClass('is-loaded');
+        if(offsetTop > windowHeight) {
+            visiblePageNumbers.push(i);
+            break;
+        } else if(!isLoaded) {
+            visiblePageNumbers.push(i);
+        }
+    }
 
+    return {pageNumberList : visiblePageNumbers, firstVisiblePage : firstVisiblePageNumber};
+}
 
-    // todo : iterate through array using binary search
-    // todo : compare with window scroll and find visible pages on viewport
+function showPageNumber(e) {
+    var firstVisiblePageNumber = getFirstVisibleElementWhileScrolling();
+    if(firstVisiblePageNumber) {
+        $('#current-first-visible-page-number')[0].innerHTML = firstVisiblePageNumber;
+    }
+}
 
+function getFirstVisibleElementWhileScrolling() {
+    var chapterParentContainerScrollPos = $(_chapter_parent_container_selector_).scrollTop(),
+        firstVisiblePageNumber = binarySearch(1, _max_page_number_, chapterParentContainerScrollPos);
+
+    return firstVisiblePageNumber;
+}
+
+function initiateInView() {
+    // inView('#chapter-parent-container .chapter-segment-container').on('enter', inViewEnterCallBack);
+}
+
+function inViewEnterCallBack(e) {
+    console.log(e);
+    var pageNumber = e ? $(e).attr('data-page-number') : '';
+
+    if(pageNumber && pageNumber > 0 && pageNumber < _max_page_number_) {
+        pageNumbersInView = [pageNumber];
+        scrollEndCallBack({pageNumberList : pageNumbersInView});
+    }
 }
 
 function binarySearch(low, high, windowScrollPos) {
     // todo : task is to find nearest minimum offsetTop wala element...
-    if(low >= high) {
-        return;
+    var windowHeight = window.innerHeight;
+
+    if(windowScrollPos === 0) {
+        return 1;
     }
 
-    var mid = (low + high) / 2;
+    if(low >= high) {
+        return low;
+    }
 
+    var mid = Math.floor((low + high) / 2);
+    var offsetTop = $('div[data-page-number="'+mid+'"]').offset().top;
 
-
+    if(offsetTop < 0) {
+        var nextPageNumber = mid + 1;
+        if(nextPageNumber <= _max_page_number_) {
+            var nextOffsetTop = $('div[data-page-number="'+nextPageNumber+'"]').offset().top;
+            if(nextOffsetTop >= 0) {
+                return mid;
+            }
+        }
+        return binarySearch(mid, high, windowScrollPos);
+    } else if(offsetTop > 0) {
+        var prevPageNumber = mid - 1;
+        if(prevPageNumber > 0) {
+            var prevOffsetTop = $('div[data-page-number="'+prevPageNumber+'"]').offset().top;
+            if(prevOffsetTop <= 0) {
+                return prevPageNumber;
+            }
+        }
+        return binarySearch(low, mid, windowScrollPos);
+    } else {
+        return mid;
+    }
 }
 
 function topMostContentIdInViewport(dataObj) {
@@ -453,7 +531,7 @@ function formatReadDetails(data, callback){
     if(bookDetails) {
         var chapterData = bookDetails.chapter_data || [];
         if(callback) {
-            callback({chapterData : chapterData, lastReadLoc : lastReadLoc});
+            callback({chapterData : chapterData, lastReadLoc : lastReadLoc}, initiateInView);
         } else {
             // todo : think what to do...
         }
@@ -584,7 +662,7 @@ function updateLastReadLocation(data) {
 }
 
 /** Insert chapter containers **/
-function insertChapters(data) {
+function insertChapters(data, callBack) {
     var chapterData = data.chapterData;
 
     if(chapterData.length > 0) {
@@ -593,6 +671,10 @@ function insertChapters(data) {
         })
         updateLastReadLocation(data.lastReadLoc);
         buildTOC(chapterData);
+
+        if(callBack) {
+            callBack();
+        }
     }
 
     // getSegments(pagesIdString, insertPages)
