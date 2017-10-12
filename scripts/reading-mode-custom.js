@@ -272,8 +272,7 @@ function bindChapterContainerScrollEnd(callBack) {
 /** This will initiate getting pages call **/
 function scrollEndCallBack() {
     // var viewportVisibleContentInfo = viewportVisibleContentInfo ? viewportVisibleContentInfo : {pageNumberList : []};
-    // var viewportVisibleContentInfo = getSegmentsInViewPort();
-    var viewportVisibleContentInfo = getSegmentsInViewPortWithBinarySearch();
+    var viewportVisibleContentInfo = getSegmentsInViewPort();
     var pageNumberList = viewportVisibleContentInfo ? viewportVisibleContentInfo.pageNumberList : [];
 
     var nonRepeatedPageNumbers = pageNumberList.filter(function(n, i) {
@@ -288,94 +287,40 @@ function scrollEndCallBack() {
     saveCurrentScrollAndFirstElement(_visible_viewport_element_obj_, viewportVisibleContentInfo);
 }
 
-/** Finding elements in viewport **/
-// function getSegmentsInViewPort() {
-//     var chapterElems = $(_chapter_parent_container_selector_ + " .chapter-container"),
-//         chapterParentContainerScrollPos = $(_chapter_parent_container_selector_).scrollTop(),
-//         windowHeight = window.innerHeight, startPageNumber, startChapterNumber, firstVisiblePage,
-//         pageNumberList = [],
-//         cont = true;
-//
-//     for(var i = 0; i < chapterElems.length; i++) {
-//         var chapterScrollPos = $(chapterElems[i]).offset().top + chapterParentContainerScrollPos;
-//         if(chapterScrollPos >= chapterParentContainerScrollPos) {
-//             if(i-1 >= 0) {
-//                 var segments = $(chapterElems[i-1]).find(".chapter-segment-container");
-//                 if(segments && segments.length > 0) {
-//                     startPageNumber = segments[0].getAttribute("data-page-number") * 1;
-//                     break;
-//                 }
-//             }
-//         }
-//     }
-//
-//     while(cont) {
-//         if(!startPageNumber || (startPageNumber > _max_page_number_)) {
-//             cont = false;
-//         } else {
-//             var selectorStr = _chapter_parent_container_selector_ + " div[data-page-number='"+startPageNumber+"']",
-//                 ele = $(selectorStr),
-//                 scrollPos = $(ele).offset().top + chapterParentContainerScrollPos,
-//                 isLoaded = $(ele).hasClass('is-loaded');
-//
-//             if(scrollPos >= chapterParentContainerScrollPos && scrollPos <= chapterParentContainerScrollPos + windowHeight) {
-//                 firstVisiblePage = firstVisiblePage ? firstVisiblePage : startPageNumber;
-//                 if(!isLoaded) {
-//                     pageNumberList.push(startPageNumber)
-//                 }
-//             } else if(scrollPos > chapterParentContainerScrollPos + windowHeight){
-//                 if(!isLoaded)
-//                     pageNumberList.push(startPageNumber)
-//                 cont = false;
-//             }
-//             startPageNumber += 1;
-//         }
-//     }
-//
-//     if(pageNumberList.length > 0) {
-//         var prevNumber = pageNumberList[0] - 1;
-//         if(prevNumber && prevNumber > 0 && pageNumberList.indexOf(prevNumber) === -1) pageNumberList.push(prevNumber);
-//     } else {
-//         var prevNumber = firstVisiblePage - 1;
-//         if(prevNumber > 0) {
-//             var ele = $("div[data-page-number='"+startPageNumber+"']"),
-//                 isLoaded = $(ele).hasClass('is-loaded');
-//             if(!isLoaded)
-//                 pageNumberList.push(prevNumber);
-//         }
-//     }
-//
-//     pageNumberList.sort();
-//     firstVisiblePage = pageNumberList[0] ? pageNumberList[0] : firstVisiblePage;
-//
-//     return {pageNumberList : pageNumberList, firstVisiblePage : firstVisiblePage};
-// }
-
-function getSegmentsInViewPortWithBinarySearch() {
+function getSegmentsInViewPort() {
     var chapterParentContainerScrollPos = $(_chapter_parent_container_selector_).scrollTop(),
         firstElement = 1,
         lastElement = _max_page_number_,
-        visiblePageNumbers = [],
         chapterElems = $(_chapter_parent_container_selector_ + " .chapter-container"),
         chapterParentContainerScrollPos = $(_chapter_parent_container_selector_).scrollTop(),
-        firstVisiblePageNumber = binarySearch(firstElement, lastElement, chapterParentContainerScrollPos),
-        windowHeight = window.innerHeight;
+        firstVisiblePageNumber = firstPageInViewPort(firstElement, lastElement, chapterParentContainerScrollPos),
+        windowHeight = window.innerHeight,
+        visiblePageNumbers;
 
     if(!firstVisiblePageNumber) return;
 
-    for(var i = firstVisiblePageNumber; i <= _max_page_number_; i++) {
+    visiblePageNumbers = getAllPagesInViewPort(firstVisiblePageNumber);
+
+    return {pageNumberList : visiblePageNumbers, firstVisiblePage : firstVisiblePageNumber};
+}
+
+function getAllPagesInViewPort(firstPageNumber) {
+    var visiblePageNumbers = [],
+        windowHeight = window.innerHeight;
+
+    for(var i = firstPageNumber; i <= _max_page_number_; i++) {
         var ele = $('div[data-page-number="'+i+'"]'),
             offsetTop = ele.offset().top
             isLoaded = ele.hasClass('is-loaded');
         if(offsetTop > windowHeight) {
-            visiblePageNumbers.push(i);
+            if(!isLoaded) visiblePageNumbers.push(i);
             break;
         } else if(!isLoaded) {
             visiblePageNumbers.push(i);
         }
     }
 
-    return {pageNumberList : visiblePageNumbers, firstVisiblePage : firstVisiblePageNumber};
+    return visiblePageNumbers;
 }
 
 function showPageNumber(e) {
@@ -387,7 +332,7 @@ function showPageNumber(e) {
 
 function getFirstVisibleElementWhileScrolling() {
     var chapterParentContainerScrollPos = $(_chapter_parent_container_selector_).scrollTop(),
-        firstVisiblePageNumber = binarySearch(1, _max_page_number_, chapterParentContainerScrollPos);
+        firstVisiblePageNumber = firstPageInViewPort(1, _max_page_number_, chapterParentContainerScrollPos);
 
     return firstVisiblePageNumber;
 }
@@ -397,7 +342,6 @@ function initiateInView() {
 }
 
 function inViewEnterCallBack(e) {
-    console.log(e);
     var pageNumber = e ? $(e).attr('data-page-number') : '';
 
     if(pageNumber && pageNumber > 0 && pageNumber < _max_page_number_) {
@@ -406,7 +350,7 @@ function inViewEnterCallBack(e) {
     }
 }
 
-function binarySearch(low, high, windowScrollPos) {
+function firstPageInViewPort(low, high, windowScrollPos) {
     // todo : task is to find nearest minimum offsetTop wala element...
     var windowHeight = window.innerHeight;
 
@@ -429,7 +373,7 @@ function binarySearch(low, high, windowScrollPos) {
                 return mid;
             }
         }
-        return binarySearch(mid, high, windowScrollPos);
+        return firstPageInViewPort(mid, high, windowScrollPos);
     } else if(offsetTop > 0) {
         var prevPageNumber = mid - 1;
         if(prevPageNumber > 0) {
@@ -438,7 +382,7 @@ function binarySearch(low, high, windowScrollPos) {
                 return prevPageNumber;
             }
         }
-        return binarySearch(low, mid, windowScrollPos);
+        return firstPageInViewPort(low, mid, windowScrollPos);
     } else {
         return mid;
     }
