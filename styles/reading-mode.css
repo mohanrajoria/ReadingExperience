@@ -116,7 +116,7 @@ Chapter content styling : common text styling and formatting across themes, add 
     display: block;
 }
 
-#chapter-parent-container .chapter-segment-container blockquote p {
+#chapter-parent-container .chapter-segment-container blockquote {
     color: #ff4646;
     font-family: "Charter", sans-serif;
     padding: 20px 100px 30px 10px;
@@ -245,17 +245,19 @@ Chapter content styling : common text styling and formatting across themes, add 
 }
 
 #page-number-container{
-    position: relative;
-    height: 30px;
-    bottom: 30px;
-    background-color: rgba(77, 77, 77, 1);
+    position: fixed;
+    height: 50px;
+    bottom: 5px;
+    /*background-color: rgba(77, 77, 77, 1);*/
 }
 
 #page-number-container #current-first-visible-page-number{
+    position: relative;
     width: 50px;
-    height: 30px;
-    float: right;
-    line-height: 30px;
-    color: white;
+    height: 50px;
+    line-height: 50px;
+    color: black;
     text-align: center;
+    border-radius: 50%;
+    background-color: #e4e4e4;
 }
