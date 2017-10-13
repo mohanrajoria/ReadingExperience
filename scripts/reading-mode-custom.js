@@ -5,13 +5,13 @@
 // todo : toc
 // todo : footnotes handling
 // done : blockquote handling
-// todo : find content in viewport : login change to binary search...
+// done : find content in viewport : login change to binary search...
 // ...filhaal toh ita hi hai...
 
 pageLoading('show');
 var __BASE_URL__ = "https://app.juggernaut.in/";
 var __USER_ID__ = "3783332750f049d897092288d1566f6c";
-var __BOOK_ID__ = "1bbad3af1be8408eadc998ff3c141ce9";
+var __BOOK_ID__ = "00572208a2e742f397f7e082aa40ae2e";
 var __AUTH_TOKEN__ = "451dcb0916904a0caadab926a96a1944";
 
 var _styling_classes_obj_ = {
