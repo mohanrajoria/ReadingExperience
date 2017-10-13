@@ -11,7 +11,7 @@
 pageLoading('show');
 var __BASE_URL__ = "https://app.juggernaut.in/";
 var __USER_ID__ = "3783332750f049d897092288d1566f6c";
-var __BOOK_ID__ = "00572208a2e742f397f7e082aa40ae2e";
+var __BOOK_ID__ = "cd08fbd152e142a095107568a7c71659";
 var __AUTH_TOKEN__ = "451dcb0916904a0caadab926a96a1944";
 
 var _styling_classes_obj_ = {
@@ -242,10 +242,6 @@ function modifyStyleOfSelectors(dataObj) {
 
 }
 
-function getFirstPageNumber() {
-
-}
-
 function scrollingCallBack(e) {
     showPageNumber(e);
 }
@@ -335,19 +331,6 @@ function getFirstVisibleElementWhileScrolling() {
         firstVisiblePageNumber = firstPageInViewPort(1, _max_page_number_, chapterParentContainerScrollPos);
 
     return firstVisiblePageNumber;
-}
-
-function initiateInView() {
-    // inView('#chapter-parent-container .chapter-segment-container').on('enter', inViewEnterCallBack);
-}
-
-function inViewEnterCallBack(e) {
-    var pageNumber = e ? $(e).attr('data-page-number') : '';
-
-    if(pageNumber && pageNumber > 0 && pageNumber < _max_page_number_) {
-        pageNumbersInView = [pageNumber];
-        scrollEndCallBack({pageNumberList : pageNumbersInView});
-    }
 }
 
 function firstPageInViewPort(low, high, windowScrollPos) {
@@ -463,7 +446,8 @@ function getChapters(callback) {
             }
         },
         error : function(data, status) {
-            userVerificationFailed(data, status);
+            errorHandler({data : data, status : status, errorType : 'API'});
+            // userVerificationFailed(data, status);
         }
     });
 }
@@ -475,7 +459,7 @@ function formatReadDetails(data, callback){
     if(bookDetails) {
         var chapterData = bookDetails.chapter_data || [];
         if(callback) {
-            callback({chapterData : chapterData, lastReadLoc : lastReadLoc}, initiateInView);
+            callback({chapterData : chapterData, lastReadLoc : lastReadLoc});
         } else {
             // todo : think what to do...
         }
@@ -529,8 +513,8 @@ function getSegments(pageIds, formatPagesDetailCallBack) {
                 }
             },
             error : function(data, status) {
-                //todo : error handling
                 updateArray(pageIds, _fetching_page_numbers_, 'pop');
+                errorHandler({data : data, status : status, errorType : 'API'});
             }
         });
     }
@@ -603,6 +587,7 @@ function updateLastReadLocation(data) {
 
     updateArray(nonRepeatedPageNumbers, _fetching_page_numbers_, 'push');
     getSegments(nonRepeatedPageNumbers, formatPagesDetail);
+    showPageNumber();
 }
 
 /** Insert chapter containers **/
@@ -620,8 +605,6 @@ function insertChapters(data, callBack) {
             callBack();
         }
     }
-
-    // getSegments(pagesIdString, insertPages)
 }
 
 /** Insert Single chapter container **/
@@ -812,4 +795,27 @@ function apiService(dataObj) {
 
 function apiURLMapper() {
 
+}
+
+function errorHandler(dataObj) {
+    if(dataObj.errorType === 'API') {
+        var statusCode = dataObj.data.status;
+        if(statusCode === 403) {
+            showPopup({msg : 'Oops! You are not authorized to access this page.', type : 'error'});
+        } else if(statusCode === 500) {
+            showPopup({msg : 'Oops! Something went wrong, please be with us and try again.', type : 'error'});
+        } else if(statusCode === 400) {
+            showPopup({msg : 'Oops! Something went wrong, please be with us and try again.', type : 'error'});
+        } else if(statusCode === 404) {
+            showPopup({msg : 'Oops! Ye page nhi mil pa rha hai.', type : 'error'});
+        } else {
+            showPopup({msg : 'Oops! Something went wrong, please be with us and try again.', type : 'error'});
+        }
+    } else {
+
+    }
+}
+
+function showPopup(dataObj) {
+    alert(dataObj.msg);
 }
