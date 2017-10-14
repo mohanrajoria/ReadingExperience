@@ -156,8 +156,9 @@ $(document).ready(function() {
 
 function chapterParentContainerClickCallback(e) {
     var targetElement = $(e.target);
-
-    if(targetElement)
+    var isFootnoteVisible = $(_footnote_popup_selector_).css('display');
+    if(isFootnoteVisible != 'none')
+        toggleFootnotePopup('hide');
 }
 
 function modifyLineHeight(lineHeight) {
