@@ -122,8 +122,11 @@ Chapter content styling : common text styling and formatting across themes, add 
     padding: 20px 100px 30px 10px;
     font-style: italic;
 }
-#chapter-parent-container .chapter-segment-container footnote {
-    /** todo : footnote styling to be done over here **/
+#chapter-parent-container .chapter-segment-container fnote.footnote-activator {
+    width: 20px;
+    content: url(../images/footnote.png);
+    cursor: pointer;
+    margin: 0px 5px;
 }
 
 /*
@@ -239,6 +242,8 @@ Chapter content styling : common text styling and formatting across themes, add 
     overflow: scroll;
     text-align: center;
     padding: 5px 10px;
+    min-height: 150px;
+    height: auto;
 }
 .seperate-btn-container {
     display: inline-block;
@@ -261,4 +266,15 @@ Chapter content styling : common text styling and formatting across themes, add 
     border-radius: 50%;
     background-color: #e4e4e4;
     float: right;
+}
+
+/** tooltip **/
+#tooltip-container{
+    position: fixed;
+    background-color: #ffffff;
+    max-height: 70vh;
+    overflow-y: scroll;
+    top: 20px;
+    box-shadow: 0px 0.1px 10px 0.5px #4d4d4d;
+    border-radius: 4px;
 }

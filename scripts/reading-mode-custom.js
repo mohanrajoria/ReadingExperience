@@ -14,104 +14,107 @@ var __USER_ID__ = "3783332750f049d897092288d1566f6c";
 var __BOOK_ID__ = "cd08fbd152e142a095107568a7c71659";
 var __AUTH_TOKEN__ = "451dcb0916904a0caadab926a96a1944";
 
-var _styling_classes_obj_ = {
-    'backgroundColorStyle' : {
-        classes : [
-            'black', 'white', 'grey', 'biege'
-        ],
-        prefix : '',
-        suffix : '-BG-theme',
-        activeClass : '',
-        default : 'white',
-        nextBackgroundColor : function(bgColorMidText) {
-            if(!bgColorMidText) return '';
-            if(this.classes.indexOf(bgColorMidText) === -1 && bgColorMidText != 'default') return '';
-
-            this.activeClass = (bgColorMidText === 'default') ? this.default : bgColorMidText;
-            return this.prefix + this.activeClass + this.suffix;
+var _all_images_data_ = {},
+    _all_footnotes_data_ = {},
+    _loaded_segment_ids_ = [],
+    _loaded_page_numbers_ = [],
+    _fetching_segment_ids_ = [],
+    _fetching_page_numbers_ = [],
+    _max_page_number_ = 1,
+    _footnote_popup_selector_ = '#tooltip-container',
+    _chapter_parent_container_selector_ = '#chapter-parent-container',
+    _visible_viewport_element_obj_ = {
+        visibleFirstElement : {
+            pageNumber : '',
+            cId : '',
+            topOffset : ''
         },
-        currentActiveClass : function() {
-            return this.activeClass ? this.prefix + this.activeClass + this.suffix : '';
-        }
+        scrollPosition : ''
     },
-    'fontSizeStyle' : {
-        classes : [
-            'xsmall', 'small', 'medium', 'large', 'xlarge'
-        ],
-        prefix : 'font-size-',
-        suffix : '',
-        activeClass : '',
-        default : 'medium',
-        validModificationTypes : ['inc', 'dec'],
-        nextFontSize : function(modificationType) {
-            if(!modificationType) return '';
-            if(this.validModificationTypes.indexOf(modificationType) === -1 && modificationType != 'default') return '';
+    _styling_classes_obj_ = {
+        'backgroundColorStyle' : {
+            classes : [
+                'black', 'white', 'grey', 'biege'
+            ],
+            prefix : '',
+            suffix : '-BG-theme',
+            activeClass : '',
+            default : 'white',
+            nextBackgroundColor : function(bgColorMidText) {
+                if(!bgColorMidText) return '';
+                if(this.classes.indexOf(bgColorMidText) === -1 && bgColorMidText != 'default') return '';
 
-            var nextClassMidStr = '',
-                classesLen = this.classes.length;
+                this.activeClass = (bgColorMidText === 'default') ? this.default : bgColorMidText;
+                return this.prefix + this.activeClass + this.suffix;
+            },
+            currentActiveClass : function() {
+                return this.activeClass ? this.prefix + this.activeClass + this.suffix : '';
+            }
+        },
+        'fontSizeStyle' : {
+            classes : [
+                'xsmall', 'small', 'medium', 'large', 'xlarge'
+            ],
+            prefix : 'font-size-',
+            suffix : '',
+            activeClass : '',
+            default : 'medium',
+            validModificationTypes : ['inc', 'dec'],
+            nextFontSize : function(modificationType) {
+                if(!modificationType) return '';
+                if(this.validModificationTypes.indexOf(modificationType) === -1 && modificationType != 'default') return '';
 
-            if(modificationType === 'default') {
-                nextClassMidStr = this.default;
-            } else {
-                for(var i = 0; i < classesLen; i++) {
-                    var a = this.classes[i];
-                    if(a === this.activeClass) {
-                        if(modificationType == 'inc') {
-                            nextClassMidStr = (this.classes[i + 1] ? this.classes[i + 1] : this.activeClass);
-                            break;
-                        } else if(modificationType == 'dec') {
-                            nextClassMidStr = (this.classes[i - 1] ? this.classes[i - 1] : this.activeClass);
-                            break;
+                var nextClassMidStr = '',
+                    classesLen = this.classes.length;
+
+                if(modificationType === 'default') {
+                    nextClassMidStr = this.default;
+                } else {
+                    for(var i = 0; i < classesLen; i++) {
+                        var a = this.classes[i];
+                        if(a === this.activeClass) {
+                            if(modificationType == 'inc') {
+                                nextClassMidStr = (this.classes[i + 1] ? this.classes[i + 1] : this.activeClass);
+                                break;
+                            } else if(modificationType == 'dec') {
+                                nextClassMidStr = (this.classes[i - 1] ? this.classes[i - 1] : this.activeClass);
+                                break;
+                            }
                         }
                     }
                 }
+
+                this.activeClass = nextClassMidStr;
+                return this.prefix + this.activeClass + this.suffix;
+            },
+            currentActiveClass : function() {
+                return this.activeClass ? this.prefix + this.activeClass + this.suffix : '';
             }
-
-            this.activeClass = nextClassMidStr;
-            return this.prefix + this.activeClass + this.suffix;
         },
-        currentActiveClass : function() {
-            return this.activeClass ? this.prefix + this.activeClass + this.suffix : '';
-        }
-    },
-    'lineHeightStyle' : {
-        classes : [
-            'small', 'medium', 'large'
-        ],
-        prefix : 'line-height-',
-        suffix : '',
-        activeClass : '',
-        default : 'medium',
-        nextLineHeight : function(lineHeightMidText) {
-            if(!lineHeightMidText) return '';
-            if(this.classes.indexOf(lineHeightMidText) === -1 && lineHeightMidText != 'default') return '';
+        'lineHeightStyle' : {
+            classes : [
+                'small', 'medium', 'large'
+            ],
+            prefix : 'line-height-',
+            suffix : '',
+            activeClass : '',
+            default : 'medium',
+            nextLineHeight : function(lineHeightMidText) {
+                if(!lineHeightMidText) return '';
+                if(this.classes.indexOf(lineHeightMidText) === -1 && lineHeightMidText != 'default') return '';
 
-            this.activeClass = (lineHeightMidText === 'default') ? this.default : lineHeightMidText;
-            return this.prefix + this.activeClass + this.suffix;
-        },
-        currentActiveClass : function() {
-            return this.activeClass ? this.prefix + this.activeClass + this.suffix : '';
+                this.activeClass = (lineHeightMidText === 'default') ? this.default : lineHeightMidText;
+                return this.prefix + this.activeClass + this.suffix;
+            },
+            currentActiveClass : function() {
+                return this.activeClass ? this.prefix + this.activeClass + this.suffix : '';
+            }
         }
-    }
-}
-
-var _loaded_segment_ids_ = [];
-var _loaded_page_numbers_ = [];
-var _fetching_segment_ids_ = [];
-var _fetching_page_numbers_ = [];
-var _max_page_number_ = 1;
-var _visible_viewport_element_obj_ = {
-    visibleFirstElement : {
-        pageNumber : '',
-        cId : '',
-        topOffset : ''
-    },
-    scrollPosition : ''
-}
-var _chapter_parent_container_selector_ = '#chapter-parent-container';
+    };
 
 $(document).ready(function() {
     // $("#init-reading-btn").on('click', function(e) {
+        toggleFootnotePopup('hide');
         getSavedUserPreferences();
         getChapters(formatReadDetails);
         bindChapterContainerScrollEnd(scrollEndCallBack);
@@ -145,7 +148,17 @@ $(document).ready(function() {
             modifyBackgroundColor(backgroundColor);
         }
     })
+
+    $(document).on('click', _chapter_parent_container_selector_, chapterParentContainerClickCallback);
+
+    $(document).on('click', 'fnote.footnote-activator', footnoteTriggerCallback)
 })
+
+function chapterParentContainerClickCallback(e) {
+    var targetElement = $(e.target);
+
+    if(targetElement)
+}
 
 function modifyLineHeight(lineHeight) {
     var obj = {
@@ -215,17 +228,16 @@ function maintainVisibleViewportContentsPosition(dataObj) {
         firstElementOffsetCurrent = $(firstVisibleElementSelector).offset().top,
         windowScrollPositionToUpdate;
 
-        if(firstElementOffsetPrevious > firstElementOffsetCurrent) {
-            var diff = firstElementOffsetPrevious - firstElementOffsetCurrent;
-            windowScrollPositionToUpdate = currentWindowScroll - diff;
+    if(firstElementOffsetPrevious > firstElementOffsetCurrent) {
+        var diff = firstElementOffsetPrevious - firstElementOffsetCurrent;
+        windowScrollPositionToUpdate = currentWindowScroll - diff;
 
-        } else if(firstElementOffsetPrevious < firstElementOffsetCurrent) {
-            var diff = firstElementOffsetPrevious - firstElementOffsetCurrent;
-            windowScrollPositionToUpdate = currentWindowScroll - diff;
-        }
+    } else if(firstElementOffsetPrevious < firstElementOffsetCurrent) {
+        var diff = firstElementOffsetPrevious - firstElementOffsetCurrent;
+        windowScrollPositionToUpdate = currentWindowScroll - diff;
+    }
 
-        scrollToGivenElement({selector : parentContainerSelector, scrollTop : windowScrollPositionToUpdate});
-
+    scrollToGivenElement({selector : parentContainerSelector, scrollTop : windowScrollPositionToUpdate});
 }
 
 function getScrollPosition(dataObj) {
@@ -244,6 +256,7 @@ function modifyStyleOfSelectors(dataObj) {
 
 function scrollingCallBack(e) {
     showPageNumber(e);
+    toggleFootnotePopup('hide');
 }
 
 function bindChapterContainerOnScroll(callBack) {
@@ -532,8 +545,13 @@ function formatPagesDetail(data, callBack) {
 
 /** Iterate and start inserting pages over here **/
 function insertPages(data) {
-    var segmentData = data.segment_data;
-    var imageData = data.image_data;
+    var segmentData = data.segment_data,
+        imageData = data.image_data,
+        footnotesData = data.footnotes_data;
+
+    _all_images_data_ = Object.assign(_all_images_data_, imageData);
+    _all_footnotes_data_ = Object.assign(_all_footnotes_data_, footnotesData);
+
     if(segmentData) {
         segmentData.forEach(function(e, i) {
             var pageNumber = e.page_number;
@@ -773,9 +791,14 @@ function scrollToGivenPosition() {
 
 /** Scroll a given element to given position **/
 function scrollToGivenElement(data) {
-    var selector = data.selector;
-    var pos = data.scrollTop;
-    $(selector).scrollTop(pos);
+    var selector = data.selector,
+        scrollPos = data.scrollTop,
+        timeout = data.timeout || 0;
+
+    $(selector).animate({
+        scrollTop : scrollPos
+    }, timeout);
+    // $(selector).scrollTop(pos);
 }
 
 /** Show hide loader **/
@@ -818,4 +841,97 @@ function errorHandler(dataObj) {
 
 function showPopup(dataObj) {
     alert(dataObj.msg);
+}
+
+function footnoteTriggerCallback(e) {
+    var footnoteId = $(e.target).attr('id'),
+        footnoteDetailObj,
+        windowScrollToUpdate,
+        popupOffsetFromFootnote = 20,
+        footnoteActiveOffsetFromTop = 50,
+        scrollParentContainer = 0,
+        activeFootnoteId = $("#tooltip-container").attr('data-footnote-id'),
+        currentWindowScroll = getScrollPosition({selector : _chapter_parent_container_selector_}),
+        windowHeight = window.innerHeight,
+        animateFootnotePopupTimeout = 300,
+        footnoteIconHeight = 20;
+
+    if(!footnoteId || !_all_footnotes_data_[footnoteId]) {
+        toggleFootnotePopup('hide');
+        return;
+    }
+
+    if(activeFootnoteId === footnoteId) {
+        return;
+    } else {
+        toggleFootnotePopup('hide');
+    }
+
+    footnoteDetailObj = _all_footnotes_data_[footnoteId];
+    updateFootnotePopupContent({footnoteId : footnoteId});
+
+    var footnoteSelector = "#" + footnoteDetailObj.chapter_id + " #" + footnoteDetailObj.segment_id + " #" + footnoteDetailObj.footnote_id;
+
+    var footnoteOffset = $(footnoteSelector).offset().top,
+        footnotePopupMaxHeight = Math.floor(windowHeight * 0.7);
+
+    $(_footnote_popup_selector_).css({'max-height' : footnotePopupHeight + 'px'});
+
+    if(footnoteOffset > footnoteActiveOffsetFromTop)
+        scrollParentContainer = footnoteOffset - footnoteActiveOffsetFromTop;
+
+    var visibleViewportBelowFootnote = windowHeight - footnoteOffset;
+
+    var footnotePopupHeight = $(_footnote_popup_selector_).height();
+
+    var scrollNeeded = false,
+        footnotePopupPosition = 'bottom';
+
+    if(footnotePopupHeight <= visibleViewportBelowFootnote - popupOffsetFromFootnote) {
+        footnotePopupPosition = 'bottom';
+    } else if(footnotePopupHeight <= footnoteOffset - popupOffsetFromFootnote) {
+        footnotePopupPosition = 'top';
+    } else {
+        if(scrollParentContainer > 0) {
+            windowScrollToUpdate = currentWindowScroll + scrollParentContainer;
+            scrollToGivenElement({selector : _chapter_parent_container_selector_, scrollTop : windowScrollToUpdate, timeout : animateFootnotePopupTimeout});
+            scrollNeeded = true;
+            footnotePopupPosition = 'bottom';
+        }
+    }
+
+    setTimeout(function() {
+        if(scrollNeeded)
+            footnoteOffset = $(_footnote_popup_selector_).offset().top;
+
+        var footnotePopupOffset;
+
+        if(footnotePopupPosition === 'top') {
+            footnotePopupOffset = footnoteOffset - popupOffsetFromFootnote - footnotePopupHeight;
+        } else if(footnotePopupPosition === 'bottom') {
+            footnotePopupOffset = footnoteOffset + popupOffsetFromFootnote + footnoteIconHeight
+        }
+
+        $(_footnote_popup_selector_).css({top : footnotePopupOffset + 'px', 'max-height' : footnotePopupHeight + 'px'});
+
+        toggleFootnotePopup('show');
+    }, animateFootnotePopupTimeout);
+}
+
+function toggleFootnotePopup(action) {
+    if(action === 'show') {
+        $(_footnote_popup_selector_).fadeIn();
+    } else {
+        $("#tooltip-container").attr({'data-footnote-id' : ''});
+        $(_footnote_popup_selector_).hide();
+    }
+}
+
+function updateFootnotePopupContent(dataObj) {
+    var id = dataObj.footnoteId,
+        footnoteData = _all_footnotes_data_[id],
+        htmlContentToAppendInPopup = footnoteData['footnote_data'];
+
+    $('#tooltip-container .html-content')[0].innerHTML = htmlContentToAppendInPopup;
+    $("#tooltip-container").attr({'data-footnote-id' : id});
 }
