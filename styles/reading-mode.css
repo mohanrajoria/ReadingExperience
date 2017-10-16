@@ -78,7 +78,8 @@ Chapter content styling : common text styling and formatting across themes, add 
     margin-top: 60px;
 }
 
-#chapter-parent-container .chapter-heading-container .chapter-name{
+#chapter-parent-container .chapter-heading-container .chapter-name,
+#chapter-parent-container .chapter-heading-container .chapter-number{
     font-size: 26px;
     color: #ff4546;
     margin-bottom: 10px;
@@ -185,6 +186,8 @@ Chapter content styling : common text styling and formatting across themes, add 
 **/
 
 .line-height-small#chapter-parent-container p,
+.line-height-small#chapter-parent-container ul,
+.line-height-small#chapter-parent-container ol,
 .line-height-small#chapter-parent-container ul li,
 .line-height-small#chapter-parent-container ol li{
     line-height: 27px;
@@ -294,15 +297,18 @@ Chapter content styling : common text styling and formatting across themes, add 
     right: 0px;
     width: 40px;
     height: 40px;
-    border: 1px solid #4d4d4d;
     border-right: 0px;
     padding: 10px;
 }
 #option-trigger-btn.background-white{
     background-color: white;
+    border: 1px solid #4d4d4d;
+    border-right: none;
 }
 #option-trigger-btn.background-black{
     background-color: black;
+    border: 1px solid white;
+    border-right: none;
 }
 #option-trigger-btn .option-trigger-btn-icon {
     width: 20px;

@@ -163,18 +163,24 @@ $(document).ready(function() {
 })
 
 function scrollToChapter(e) {
-    var ele = $(e.target);
-    var id, chapterEle;
+    var ele = $(e.target),
+        id,
+        chapterEle,
+        eleOffset,
+        parentContainerScrollPosition = $(_chapter_parent_container_selector_).scrollTop();
+
     if(!ele.hasClass('chapter-toc')) {
         mainEle = ele.closest('.chapter-toc')[0];
     } else {
         mainEle = ele;
     }
 
-    var id = $(mainEle).attr('id');
+    id = $(mainEle).attr('id');
+    eleOffset = $('.chapter-container#' + id).position().top;
+    scrollTop = parentContainerScrollPosition + eleOffset;
 
     $(_chapter_parent_container_selector_).animate({
-        scrollTop: $('.chapter-container#' + id).position().top
+        scrollTop: scrollTop
     }, 500);
 
 }
