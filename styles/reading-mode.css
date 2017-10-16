@@ -93,18 +93,21 @@ Chapter content styling : common text styling and formatting across themes, add 
 #chapter-parent-container .chapter-segment-container p {
     margin-bottom: 15px;
     font-family: "Charter",sans-serif;
+    word-wrap: break-word;
 }
 
 #chapter-parent-container .chapter-segment-container ol, ul{
     list-style-type: decimal;
     list-style-position: inside;
     padding-left: 40px;
+    word-wrap: break-word;
 }
 
 #chapter-parent-container .chapter-segment-container ol li, ul li{
     list-style-type: decimal;
     color: #333;
     font-family: "Charter",sans-serif;
+    word-wrap: break-word;
     /*font-size: 20px;
     line-height: 30px;*/
 }
@@ -121,6 +124,7 @@ Chapter content styling : common text styling and formatting across themes, add 
     font-family: "Charter", sans-serif;
     padding: 20px 100px 30px 10px;
     font-style: italic;
+    word-wrap: break-word;
 }
 #chapter-parent-container .chapter-segment-container fnote.footnote-activator {
     width: 20px;
@@ -149,7 +153,7 @@ Chapter content styling : common text styling and formatting across themes, add 
 
 
 .black-BG-theme#chapter-parent-container{
-    background-color: rgba(77, 77, 77, 1);
+    background-color: rgba(0, 0, 0, 1);
 }
 .grey-BG-theme#chapter-parent-container{
     background-color: rgba(245, 245, 245, 1);
@@ -234,6 +238,7 @@ Chapter content styling : common text styling and formatting across themes, add 
     border-right: 1px solid #e4e4e4;
     padding: 0px;
 }
+
 #style-btn-container{
     position: fixed;
     top: 0px;
@@ -245,6 +250,8 @@ Chapter content styling : common text styling and formatting across themes, add 
     padding: 5px 10px;
     min-height: 150px;
     height: auto;
+
+    display: none;
 }
 .seperate-btn-container {
     display: inline-block;
@@ -278,4 +285,309 @@ Chapter content styling : common text styling and formatting across themes, add 
     top: 20px;
     box-shadow: 0px 0.1px 10px 0.5px #4d4d4d;
     border-radius: 4px;
+    word-wrap: break-word;
+}
+
+#option-trigger-btn {
+    position: absolute;
+    top: 50px;
+    right: 0px;
+    width: 40px;
+    height: 40px;
+    border: 1px solid #4d4d4d;
+    border-right: 0px;
+    padding: 10px;
+}
+#option-trigger-btn.background-white{
+    background-color: white;
+}
+#option-trigger-btn.background-black{
+    background-color: black;
+}
+#option-trigger-btn .option-trigger-btn-icon {
+    width: 20px;
+    cursor: pointer;
+}
+#option-trigger-btn.background-white .option-trigger-btn-icon{
+    content: url(../images/read_setting.png);
+}
+#option-trigger-btn.background-black .option-trigger-btn-icon{
+    content: url(../images/read_setting_white.png);
+}
+
+.style-btn-container{
+    position: absolute;
+    top: 50px;
+    right: 0px;
+    width: 40px;
+    height: auto;
+    /*border: 1px solid #4d4d4d;*/
+    border-right: 0px;
+}
+.style-btn-container.background-white{
+    background-color: white;
+}
+.style-btn-container.background-black{
+    background-color: black;
+}
+
+.option-expanded{
+    position: absolute;
+    right: 50px;
+    /*width: 430px;*/
+    border-radius: 4px;
+    border: none;
+    box-shadow: 0px 0px 2px 0.1px #8c7b7b;
+}
+
+.text-format {
+    height: 52px;
+    width: 430px;
+}
+
+@media screen and (max-width: 500px){
+    .text-format{
+        width: 243px;
+        height: 106px;
+    }
+    .background-color .background-color-update{
+        width: 54px;
+    }
+}
+
+.background-white .option-expanded{
+    background-color: white;
+}
+.background-black .option-expanded{
+    background-color: black;
+}
+
+.option-container{
+    position: relative;
+    width: 40px;
+    height: 40px;
+    padding: 10px;
+}
+.background-white .option-container {
+    background-color: white;
+}
+.background-black .option-container {
+    background-color: black;
+}
+/*
+.option-types{
+    position: absolute;
+    top: 50px;
+    right: 0px;
+    width: 40px;
+    height: auto;
+    border: 1px solid #4d4d4d;
+    border-right: 0px;
+}*/
+
+.background-white .option-types{
+    border: 1px solid black;
+}
+.background-black .option-types{
+    border: 1px solid white;
+}
+
+.option-container{
+    border-right: 1px solid #e4e4e4;
+}
+
+.background-white .option-container:not(:last-child){
+    border-bottom: 1px solid black;
+}
+.background-black .option-container:not(:last-child){
+    border-bottom: 1px solid white;
+}
+
+.text-format-icon, .toc-icon{
+    width: 20px;
+    cursor: pointer;
+}
+.background-white .text-format-icon {
+    /*content: url(../images/read_setting.png);*/
+    color: black;
+}
+.background-black .text-format-icon {
+    /*content: url(../images/read_setting.png);*/
+    color: white;
+}
+
+.background-white .toc-icon{
+    content: url(../images/read_para.png);
+}
+.background-black .toc-icon{
+    content: url(../images/read_para_white.png);
+}
+
+.font-size{
+    padding: 4px 6px;
+}
+.line-height{
+    padding: 4px 6px;
+}
+.background-color{
+    padding: 4px 6px;
+}
+
+.font-size-update{
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    border: 1px solid #e4e4e4;
+    margin-top: 2px;
+}
+
+.line-height-update{
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    border: 1px solid #e4e4e4;
+}
+
+.background-color-update{
+    width: 40px;
+    height: 40px;
+    border: 1px solid #e4e4e4;
+}
+
+.font-size-update .icon{
+    padding: 12px 9px;
+}
+.line-height-update.small .icon{
+    padding: 10px;
+}
+.line-height-update.mid .icon{
+    padding: 8px;
+}
+.line-height-update.large .icon{
+    padding: 7px;
+}
+
+
+.background-white .font-size-update.dec .icon{
+    content: url(../images/font_minus.png);
+}
+.background-white .font-size-update.inc .icon{
+    content: url(../images/font_plus.png);
+}
+.background-black .font-size-update.dec .icon{
+    content: url(../images/font_minus_white.png);
+}
+.background-black .font-size-update.inc .icon{
+    content: url(../images/font_plus_white.png);
+}
+
+.background-white .line-height-update.small .icon{
+    content: url(../images/para1.png);
+}
+.background-white .line-height-update.mid .icon{
+    content: url(../images/para2.png);
+}
+.background-white .line-height-update.large .icon{
+    content: url(../images/para3.png);
+}
+
+.background-black .line-height-update.small .icon{
+    content: url(../images/para1_white.png);
+}
+.background-black .line-height-update.mid .icon{
+    content: url(../images/para2_white.png);
+}
+.background-black .line-height-update.large .icon{
+    content: url(../images/para3_white.png);
+}
+
+.background-color-update.white{
+    background-color: rgba(255, 255, 255, 1);
+    color: black;
+}
+.background-color-update.black{
+    background-color: rgba(0, 0, 0, 1);
+    color: white;
+}
+.background-color-update.grey{
+    background-color: rgba(245, 245, 245, 1);
+    color: black;
+}
+.background-color-update.biege{
+    background-color: rgba(255, 248, 238, 1);
+    color: black;
+}
+
+
+
+
+/*** Table of content styling ***/
+.toc-heading {
+    color: #FF4646;
+    padding: 5px 5px;
+    padding-top: 10px;
+    font-size: 20px;
+    text-align: center;
+}
+
+.background-white .toc-heading {
+    border-bottom: 1px solid #e4e4e4;
+}
+.background-black .toc-heading {
+    border-bottom: 1px solid white;
+}
+
+.table-of-content {
+    width: 250px;
+}
+
+
+.chapter-toc {
+    padding: 15px 0;
+    clear: both;
+    display: inline-block;
+    font-family: "Charter",sans-serif;
+    font-size: 17px;
+    position: relative;
+    width: 100%;
+    cursor: pointer;
+}
+
+.background-black .chapter-toc{
+    color: white;
+}
+.background-white .chapter-toc{
+    color: black;
+}
+
+.background-black .chapter-toc:not(:last-child){
+    border-bottom: 1px solid white;
+}
+.background-white .chapter-toc:not(:last-child){
+    border-bottom: 1px solid #e4e4e4;
+}
+
+.toc-chapter-list{
+    padding: 10px;
+    overflow-y: scroll;
+    max-height: 350px;
+}
+
+.chapter-index{
+    width: 25px;
+    float: left;
+    font-weight: bold;
+}
+.chapter-name-text {
+    width: 170px;
+    float: left;
+    text-transform: capitalize;
+}
+.chapter-start-page {
+    width: 35px;
+    float: right;
+    text-align: right;
+    font-size: 13px;
+    color: #000;
+    opacity: .3;
 }

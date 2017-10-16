@@ -121,7 +121,7 @@ $(document).ready(function() {
         bindChapterContainerOnScroll(scrollingCallBack);
     // })
 
-    $('.font-size-update').on('click', function(e) {
+    $(document).on('click', '.font-size-update', function(e) {
         var fontSizeAttr = 'data-font-size';
         var fontSize = e.target.getAttribute(fontSizeAttr);
         if(fontSize){
@@ -131,7 +131,7 @@ $(document).ready(function() {
         }
     })
 
-    $('.line-height-update').on('click', function(e) {
+    $(document).on('click', '.line-height-update', function(e) {
         var lineHeightAttr = 'data-line-height';
         var lineHeight = e.target.getAttribute(lineHeightAttr);
         if(lineHeight) {
@@ -141,7 +141,7 @@ $(document).ready(function() {
         }
     })
 
-    $('.background-color-update').on('click', function(e) {
+    $(document).on('click', '.background-color-update', function(e) {
         var backgroundColorAttr = 'data-background-color';
         var backgroundColor = e.target.getAttribute(backgroundColorAttr);
         if(backgroundColor) {
@@ -152,7 +152,48 @@ $(document).ready(function() {
     $(document).on('click', _chapter_parent_container_selector_, chapterParentContainerClickCallback);
 
     $(document).on('click', 'fnote.footnote-activator', footnoteTriggerCallback)
+
+    $(document).on('click', '#option-trigger-btn', toggleReadingOptions)
+
+    $(document).on('click', '.toc-option', showTableOfContent)
+
+    $(document).on('click', '.text-format-option', showTextFormatOptions)
+
+    $(document).on('click', '.chapter-toc', scrollToChapter);
 })
+
+function scrollToChapter(e) {
+    var ele = $(e.target);
+    var id, chapterEle;
+    if(!ele.hasClass('chapter-toc')) {
+        mainEle = ele.closest('.chapter-toc')[0];
+    } else {
+        mainEle = ele;
+    }
+
+    var id = $(mainEle).attr('id');
+
+    $(_chapter_parent_container_selector_).animate({
+        scrollTop: $('.chapter-container#' + id).position().top
+    }, 500);
+
+}
+
+function showTextFormatOptions(e) {
+    $('.table-of-content').hide();
+    $('.text-format').show();
+    $('.option-expanded').fadeIn();
+}
+
+function showTableOfContent(e) {
+    $('.table-of-content').show();
+    $('.text-format').hide();
+    $('.option-expanded').fadeIn();
+}
+
+function toggleReadingOptions(e) {
+    $('.style-btn-container').fadeIn();
+}
 
 function chapterParentContainerClickCallback(e) {
     var targetElement = $(e.target),
@@ -162,6 +203,8 @@ function chapterParentContainerClickCallback(e) {
         if(isFootnoteVisible != 'none')
             toggleFootnotePopup('hide');
     }
+
+    $('.style-btn-container, .option-expanded, .table-of-content, .text-format').hide();
 }
 
 function modifyLineHeight(lineHeight) {
@@ -188,6 +231,9 @@ function modifyBackgroundColor(bgColor) {
         classToRemove : _styling_classes_obj_['backgroundColorStyle']['currentActiveClass'](),
         classToAdd : _styling_classes_obj_['backgroundColorStyle']['nextBackgroundColor'](bgColor),
     }
+
+    updateBGColorForReadingOptions(bgColor);
+
     modifyClassesForSelector(obj);
 }
 
@@ -199,6 +245,15 @@ function modifyClassesForSelector(dataObj) {
     if(selector) {
         if(classToRemove) $(selector).removeClass(classToRemove);
         if(classToAdd) $(selector).addClass(classToAdd);
+    }
+}
+
+function updateBGColorForReadingOptions(color) {
+    var eleSelector = ".option-trigger-btn, .style-btn-container";
+    if(color === 'black') {
+        $(eleSelector).removeClass('background-white').addClass('background-black');
+    } else {
+        $(eleSelector).removeClass('background-black').addClass('background-white');
     }
 }
 
@@ -615,18 +670,65 @@ function updateLastReadLocation(data) {
 /** Insert chapter containers **/
 function insertChapters(data, callBack) {
     var chapterData = data.chapterData;
-
+    buildTOC(chapterData);
     if(chapterData.length > 0) {
         chapterData.forEach(function(ch, i) {
             insertSingleChapter(ch);
         })
         updateLastReadLocation(data.lastReadLoc);
-        buildTOC(chapterData);
 
         if(callBack) {
             callBack();
         }
     }
+}
+
+/** TOC formation **/
+function buildTOC(data) {
+    var mainChapterCount = 1;
+    data.forEach(function(ch, i) {
+        var chId = ch.chapter_id,
+            chHeading = ch.heading_data ? ch.heading_data.html : "",
+            startPage = ch.starting_page_number,
+            chType = ch.chapter_type,
+            chName = (function(chName, chType) {
+                if(chType === 1) {
+                    chName = chName ? chName : "Preface"
+                } else if(chType === 2) {
+                    chName = chName ? chName : "Chapter"
+                } else if(chType === 3) {
+                    chName = chName ? chName : "Post chapter"
+                }
+                return chName;
+            })(ch.chapter_name, chType),
+            chString = getChapterStringToAppendInTOC({chName : chName, startPage : startPage, chIndex : mainChapterCount, chType : chType, chId : chId});
+
+        updateChapterInTOC({chType : chType, chString : chString});
+        mainChapterCount = (chType === 2) ? mainChapterCount + 1 : mainChapterCount;
+    })
+}
+
+function updateChapterInTOC(data) {
+    if(!data) return;
+    if(data.chType === 1) {
+        $('.toc-chapter-list').append(data.chString);
+    } else if(data.chType === 2) {
+        $('.toc-chapter-list').append(data.chString);
+    } else if(data.chType === 3) {
+        $('.toc-chapter-list').append(data.chString);
+    }
+}
+
+function getChapterStringToAppendInTOC(dataObj) {
+    if(!dataObj) return "";
+
+    chIndexStr = (dataObj.chType === 2) ? '<div class = "chapter-index">'+dataObj.chIndex+'</div>' : '';
+
+    return '<div class = "chapter-toc" id = "'+dataObj.chId+'">' +
+                chIndexStr +
+                '<div class = "chapter-name-text">'+dataObj.chName+'</div>' +
+                '<div class = "chapter-start-page">'+dataObj.startPage+'</div>' +
+            '</div>';
 }
 
 /** Insert Single chapter container **/
@@ -635,6 +737,9 @@ function insertSingleChapter(data) {
         var chapterHTML = singleChapterContainer(data);
         $(_chapter_parent_container_selector_).append(chapterHTML);
         insertPageContainer(data);
+
+        updateChapterInTOC(data);
+
     } else {
         // todo : think what to do...
     }
@@ -665,11 +770,6 @@ function insertSinglePage(data) {
         $("#"+chapterId).append(pageHTML);
         _max_page_number_ = data.pageNumber;
     }
-}
-
-/** TOC formation **/
-function buildTOC(data) {
-    // todo : chumma... chumma de de...
 }
 
 /** return chapter container template **/
