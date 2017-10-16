@@ -290,7 +290,7 @@ function modifyClassesForSelector(dataObj) {
 }
 
 function updateBGColorForReadingOptions(color) {
-    var eleSelector = ".option-trigger-btn, .style-btn-container";
+    var eleSelector = ".option-trigger-btn, .style-btn-container, #tooltip-container";
     if(color === 'black') {
         $(eleSelector).removeClass('background-white').addClass('background-black');
     } else {
@@ -1021,6 +1021,7 @@ function footnoteTriggerCallback(e) {
         footnotePopupMaxHeight = Math.floor(windowHeight * 0.7);
 
     $(_footnote_popup_selector_).css({'max-height' : footnotePopupMaxHeight + 'px'});
+    // $(_footnote_popup_selector_ + ' .inner-container').css({'max-height' : footnotePopupMaxHeight + 'px'});
 
     if(footnoteOffset > footnoteActiveOffsetFromTop)
         scrollParentContainer = footnoteOffset - footnoteActiveOffsetFromTop;
@@ -1054,10 +1055,10 @@ function footnoteTriggerCallback(e) {
         if(footnotePopupPosition === 'top') {
             footnotePopupOffset = footnoteOffset - popupOffsetFromFootnote - footnotePopupHeight;
         } else if(footnotePopupPosition === 'bottom') {
-            footnotePopupOffset = footnoteOffset + popupOffsetFromFootnote + footnoteIconHeight
+            footnotePopupOffset = footnoteOffset + popupOffsetFromFootnote + footnoteIconHeight;
         }
 
-        $(_footnote_popup_selector_).css({top : footnotePopupOffset + 'px', 'max-height' : footnotePopupHeight + 'px'});
+        $(_footnote_popup_selector_).css({top : footnotePopupOffset + 'px', 'max-height' : footnotePopupMaxHeight + 'px'});
 
         toggleFootnotePopup('show');
     }, animateFootnotePopupTimeout + 100);

@@ -280,9 +280,16 @@ Chapter content styling : common text styling and formatting across themes, add 
 }
 
 /** tooltip **/
+.background-white#tooltip-container{
+    background-color: white;
+    color: black;
+}
+.background-black#tooltip-container{
+    background-color: black;
+    color: white;
+}
 #tooltip-container{
     position: fixed;
-    background-color: #ffffff;
     max-height: 70vh;
     overflow-y: scroll;
     top: 20px;
