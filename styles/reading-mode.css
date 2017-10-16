@@ -460,13 +460,19 @@ Chapter content styling : common text styling and formatting across themes, add 
     border: 1px solid #e4e4e4;
 }
 
+.background-color-update.active,
+.font-size-update.active,
+.line-height-update.active{
+    border: 1px solid #FF4646;
+}
+
 .font-size-update .icon{
     padding: 12px 9px;
 }
 .line-height-update.small .icon{
     padding: 10px;
 }
-.line-height-update.mid .icon{
+.line-height-update.medium .icon{
     padding: 8px;
 }
 .line-height-update.large .icon{
@@ -490,7 +496,7 @@ Chapter content styling : common text styling and formatting across themes, add 
 .background-white .line-height-update.small .icon{
     content: url(../images/para1.png);
 }
-.background-white .line-height-update.mid .icon{
+.background-white .line-height-update.medium .icon{
     content: url(../images/para2.png);
 }
 .background-white .line-height-update.large .icon{
@@ -500,7 +506,7 @@ Chapter content styling : common text styling and formatting across themes, add 
 .background-black .line-height-update.small .icon{
     content: url(../images/para1_white.png);
 }
-.background-black .line-height-update.mid .icon{
+.background-black .line-height-update.medium .icon{
     content: url(../images/para2_white.png);
 }
 .background-black .line-height-update.large .icon{

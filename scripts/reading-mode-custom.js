@@ -49,6 +49,9 @@ var _all_images_data_ = {},
             },
             currentActiveClass : function() {
                 return this.activeClass ? this.prefix + this.activeClass + this.suffix : '';
+            },
+            getDefaultValue : function() {
+                return this.default
             }
         },
         'fontSizeStyle' : {
@@ -89,6 +92,9 @@ var _all_images_data_ = {},
             },
             currentActiveClass : function() {
                 return this.activeClass ? this.prefix + this.activeClass + this.suffix : '';
+            },
+            getDefaultValue : function() {
+                return this.default
             }
         },
         'lineHeightStyle' : {
@@ -108,6 +114,9 @@ var _all_images_data_ = {},
             },
             currentActiveClass : function() {
                 return this.activeClass ? this.prefix + this.activeClass + this.suffix : '';
+            },
+            getDefaultValue : function() {
+                return this.default
             }
         }
     };
@@ -213,12 +222,31 @@ function chapterParentContainerClickCallback(e) {
     $('.style-btn-container, .option-expanded, .table-of-content, .text-format').hide();
 }
 
+function updateIconStyle(dataObj) {
+    if(!dataObj || !dataObj.value) return;
+
+    if(dataObj.type === 'bgColor') {
+        $(".background-color-update").removeClass('active');
+        $(".background-color-update." + dataObj.value).addClass('active');
+    } else if(dataObj.type === 'lineHeight') {
+        $(".line-height-update").removeClass('active');
+        $(".line-height-update." + dataObj.value).addClass('active');
+    } else if(dataObj.type === 'fontSize') {
+        $(".font-size-update").removeClass('active');
+        $(".font-size-update." + dataObj.value).addClass('active');
+    }
+}
+
 function modifyLineHeight(lineHeight) {
     var obj = {
         selector : _chapter_parent_container_selector_,
         classToRemove : _styling_classes_obj_['lineHeightStyle']['currentActiveClass'](),
-        classToAdd : _styling_classes_obj_['lineHeightStyle']['nextLineHeight'](lineHeight)
+        classToAdd : _styling_classes_obj_['lineHeightStyle']['nextLineHeight'](lineHeight),
+        defaultStyle : _styling_classes_obj_['lineHeightStyle']['getDefaultValue'](),
     }
+
+    updateIconStyle({type : 'lineHeight', value : (lineHeight === 'default' ? obj.defaultStyle : lineHeight)});
+
     modifyClassesForSelector(obj);
 }
 
@@ -227,7 +255,11 @@ function modifyFontSize(fontSize) {
         selector : _chapter_parent_container_selector_,
         classToRemove : _styling_classes_obj_['fontSizeStyle']['currentActiveClass'](),
         classToAdd : _styling_classes_obj_['fontSizeStyle']['nextFontSize'](fontSize),
+        defaultStyle : _styling_classes_obj_['fontSizeStyle']['getDefaultValue']()
     }
+
+    updateIconStyle({type : 'fontSize', value : (fontSize === 'default' ? '' : fontSize)});
+
     modifyClassesForSelector(obj);
 }
 
@@ -236,7 +268,10 @@ function modifyBackgroundColor(bgColor) {
         selector : _chapter_parent_container_selector_,
         classToRemove : _styling_classes_obj_['backgroundColorStyle']['currentActiveClass'](),
         classToAdd : _styling_classes_obj_['backgroundColorStyle']['nextBackgroundColor'](bgColor),
+        defaultStyle : _styling_classes_obj_['backgroundColorStyle']['getDefaultValue'](),
     }
+
+    updateIconStyle({type : 'bgColor', value : (bgColor === 'default' ? obj.defaultStyle : bgColor)});
 
     updateBGColorForReadingOptions(bgColor);
 
