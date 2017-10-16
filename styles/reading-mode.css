@@ -127,6 +127,7 @@ Chapter content styling : common text styling and formatting across themes, add 
     content: url(../images/footnote.png);
     cursor: pointer;
     margin: 0px 5px;
+    cursor: pointer;
 }
 
 /*

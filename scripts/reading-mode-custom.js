@@ -155,10 +155,13 @@ $(document).ready(function() {
 })
 
 function chapterParentContainerClickCallback(e) {
-    var targetElement = $(e.target);
-    var isFootnoteVisible = $(_footnote_popup_selector_).css('display');
-    if(isFootnoteVisible != 'none')
-        toggleFootnotePopup('hide');
+    var targetElement = $(e.target),
+        isFootnoteVisible = $(_footnote_popup_selector_).css('display');
+
+    if(!targetElement.hasClass('footnote-activator')) {
+        if(isFootnoteVisible != 'none')
+            toggleFootnotePopup('hide');
+    }
 }
 
 function modifyLineHeight(lineHeight) {
@@ -876,7 +879,7 @@ function footnoteTriggerCallback(e) {
     var footnoteOffset = $(footnoteSelector).offset().top,
         footnotePopupMaxHeight = Math.floor(windowHeight * 0.7);
 
-    $(_footnote_popup_selector_).css({'max-height' : footnotePopupHeight + 'px'});
+    $(_footnote_popup_selector_).css({'max-height' : footnotePopupMaxHeight + 'px'});
 
     if(footnoteOffset > footnoteActiveOffsetFromTop)
         scrollParentContainer = footnoteOffset - footnoteActiveOffsetFromTop;
@@ -888,7 +891,7 @@ function footnoteTriggerCallback(e) {
     var scrollNeeded = false,
         footnotePopupPosition = 'bottom';
 
-    if(footnotePopupHeight <= visibleViewportBelowFootnote - popupOffsetFromFootnote) {
+    if(footnotePopupHeight <= visibleViewportBelowFootnote - popupOffsetFromFootnote - footnoteIconHeight) {
         footnotePopupPosition = 'bottom';
     } else if(footnotePopupHeight <= footnoteOffset - popupOffsetFromFootnote) {
         footnotePopupPosition = 'top';
@@ -903,7 +906,7 @@ function footnoteTriggerCallback(e) {
 
     setTimeout(function() {
         if(scrollNeeded)
-            footnoteOffset = $(_footnote_popup_selector_).offset().top;
+            footnoteOffset = $(footnoteSelector).offset().top;
 
         var footnotePopupOffset;
 
@@ -916,7 +919,7 @@ function footnoteTriggerCallback(e) {
         $(_footnote_popup_selector_).css({top : footnotePopupOffset + 'px', 'max-height' : footnotePopupHeight + 'px'});
 
         toggleFootnotePopup('show');
-    }, animateFootnotePopupTimeout);
+    }, animateFootnotePopupTimeout + 100);
 }
 
 function toggleFootnotePopup(action) {
