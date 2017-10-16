@@ -2,16 +2,15 @@
 // done : find cid of first element
 // todo : ajax url and request handler normalization
 // done : maintain Viweport content on line height change and font size change
-// todo : toc
-// todo : footnotes handling
+// done : toc
+// done : footnotes handling
 // done : blockquote handling
 // done : find content in viewport : login change to binary search...
 // ...filhaal toh ita hi hai...
-
-pageLoading('show');
+screenOverlayHandler({action : 'show', type : 'page-loading'});
 var __BASE_URL__ = "https://app.juggernaut.in/";
-var __USER_ID__ = "3783332750f049d897092288d1566f6c";
-var __BOOK_ID__ = "cd08fbd152e142a095107568a7c71659";
+var __USER_ID__ = "";//"3783332750f049d897092288d1566f6c";
+var __BOOK_ID__ = "";//"cd08fbd152e142a095107568a7c71659";
 var __AUTH_TOKEN__ = "451dcb0916904a0caadab926a96a1944";
 
 var _all_images_data_ = {},
@@ -122,13 +121,13 @@ var _all_images_data_ = {},
     };
 
 $(document).ready(function() {
-    // $("#init-reading-btn").on('click', function(e) {
+    validateUserForBook(function() {
         toggleFootnotePopup('hide');
         getSavedUserPreferences();
         getChapters(formatReadDetails);
         bindChapterContainerScrollEnd(scrollEndCallBack);
         bindChapterContainerOnScroll(scrollingCallBack);
-    // })
+    })
 
     $(document).on('click', '.font-size-update', function(e) {
         var fontSizeAttr = 'data-font-size';
@@ -529,13 +528,43 @@ function getUserCreds() {
 }
 
 /** Not in use abhi **/
-function validateUserForBook(data) {
-    // todo : request and validate user for given bookId
+function validateUserForBook(callBack) {
+    var queryParams = location.search,
+        parsedParams = queryParams.split('&'),
+        userId, bookId;
+
+    parsedParams.forEach(function(par, ind) {
+        if(par.indexOf('user_id') != -1) {
+            var arr = par.split('user_id=');
+            userId = arr[arr.length - 1];
+        } else if(par.indexOf('book_id') != -1) {
+            var arr = par.split('book_id=');
+            bookId = arr[arr.length - 1];
+        }
+    })
+
+    if(userId && bookId) {
+        // todo : make an ajax call and verify
+        var validate = 'success'
+        if(validate === 'success') {
+            __USER_ID__ = userId;
+            __BOOK_ID__ = bookId;
+            // todo : setAuthToken over here
+            parentReadingContainerToggle('show');
+            callBack();
+        } else {
+            screenOverlayHandler({action : 'show', type : 'error', msg : 'Oops! You are not allowed to access this page.'});
+        }
+    } else {
+        screenOverlayHandler({action : 'show', type : 'error', msg : 'Oops! You have reached to a wrong url, please check and try again.'});
+    }
 }
 
-/** Not in use abhi **/
-function userVerificationFailed(data) {
-    // todo : user is not verified for this call, so tell him ki 'bhai tumse na ho payega'.
+function parentReadingContainerToggle(action) {
+    if(action === 'show')
+        $('#reading-parent-container').removeClass('in-active');
+    else if(action === 'hide')
+        $('#reading-parent-container').addClass('in-active');
 }
 
 /** Fetch all the chapters for this book **/
@@ -679,7 +708,7 @@ function insertPages(data) {
             }
             updateArray([pageNumber], _fetching_page_numbers_, 'pop');
         })
-        pageLoading('hide');
+        screenOverlayHandler({action : 'hide', type : 'page-loading'});
     } else {
         // todo : woooooo
     }
@@ -947,11 +976,19 @@ function scrollToGivenElement(data) {
 }
 
 /** Show hide loader **/
-function pageLoading(action) {
-    if(action === 'show') {
-        $('#page-loading-container').removeClass('in-active');
-    } else if(action === 'hide') {
-        $('#page-loading-container').addClass('in-active');
+function screenOverlayHandler(dataObj) {
+    if(dataObj.action === 'show') {
+        $('.display-message').addClass('in-active');
+        if(dataObj.msg) $('.screen-message-overlay .msg').html(dataObj.msg);
+        if(dataObj.type === 'error') {
+            $('.screen-message-overlay .error-page').removeClass('in-active');
+        } else if(dataObj.type === 'page-loading') {
+            $('.screen-message-overlay .page-loading').removeClass('in-active');
+        }
+        $('.screen-message-overlay').show();
+    } else if(dataObj.action === 'hide') {
+        $('.screen-message-overlay').hide();
+        $('.display-message').addClass('in-active');
     }
 }
 
@@ -969,15 +1006,17 @@ function errorHandler(dataObj) {
     if(dataObj.errorType === 'API') {
         var statusCode = dataObj.data.status;
         if(statusCode === 403) {
-            showPopup({msg : 'Oops! You are not authorized to access this page.', type : 'error'});
+            screenOverlayHandler({action : 'show', type : 'error', msg : 'Oops! You are not allowed to access this page.'});
+            // showPopup({msg : 'Oops! You are not authorized to access this page.', type : 'error'});
         } else if(statusCode === 500) {
-            showPopup({msg : 'Oops! Something went wrong, please be with us and try again.', type : 'error'});
+            screenOverlayHandler({action : 'show', type : 'error', msg : 'Oops! Something went wrong, please be with us and try again.'});
+            // showPopup({msg : 'Oops! Something went wrong, please be with us and try again.', type : 'error'});
         } else if(statusCode === 400) {
-            showPopup({msg : 'Oops! Something went wrong, please be with us and try again.', type : 'error'});
+            screenOverlayHandler({action : 'show', type : 'error', msg : 'Oops! Something went wrong, please be with us and try again.'});
         } else if(statusCode === 404) {
-            showPopup({msg : 'Oops! Ye page nhi mil pa rha hai.', type : 'error'});
+            screenOverlayHandler({action : 'show', type : 'error', msg : 'Oops! This page does not exist.'});
         } else {
-            showPopup({msg : 'Oops! Something went wrong, please be with us and try again.', type : 'error'});
+            screenOverlayHandler({action : 'show', type : 'error', msg : 'Oops! Something went wrong, please be with us and try again.'});
         }
     } else {
 

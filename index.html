@@ -13,11 +13,16 @@
     <link href="/styles/reading-mode.css" rel="stylesheet">
 </head>
 <body>
-    <div class = "container-fluid page-loading-container active" id = "page-loading-container">
-        <img src = "images/logo_spin.gif">
-        <div>We are binding your book.</div>
+    <div class = "container-fluid screen-message-overlay" id = "screen-message-overlay" style = "display: none;">
+        <div class = "page-loading display-message">
+            <img src = "images/logo_spin.gif">
+            <div class = "msg">We are binding your book.</div>
+        </div>
+        <div class = "error-page display-message in-active">
+            <div class = "msg"></div>
+        </div>
     </div>
-    <div class = "container-fluid reading-parent-container" id = "reading-parent-container">
+    <div class = "container-fluid reading-parent-container in-active" id = "reading-parent-container">
         <div class = "row">
             <div class = "col-md-8 col-sm-10 col-xs-12 col-md-offset-2 col-sm-offset-1 col-xs-offset-0" id = "reading-layout-container">
                 <div class = "col-md-12 col-sm-12 col-xs-12" id = "chapter-parent-container">

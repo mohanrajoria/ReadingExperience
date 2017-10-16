@@ -1,3 +1,6 @@
+#reading-parent-container.in-active{
+    display: none;
+}
 #chapter-parent-container {
     height: 100vh;
     max-height: 100vh;
@@ -36,7 +39,7 @@
 }
 /** Custom scrollbar ends here **/
 
-#page-loading-container{
+.screen-message-overlay{
     position: absolute;
     height: 100%;
     width: 100%;
@@ -44,17 +47,27 @@
     text-align: center;
     z-index:99;
     background-color: white;
-    padding-top: 25%;
     z-index: 99999;
 }
 
-#page-loading-container img{
+.display-message{
+    margin-top: 40vh;
+}
+
+.page-loading img{
     width: 40px;
     height: 40px;
 }
 
-#page-loading-container.in-active{
+.page-loading.in-active{
     display: none;
+}
+.error-page.in-active{
+    display: none;
+}
+.display-message .msg{
+    color: #FF4646;
+    font-size: 18px;
 }
 
 /**
