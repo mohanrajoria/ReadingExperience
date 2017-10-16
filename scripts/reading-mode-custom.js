@@ -168,7 +168,13 @@ $(document).ready(function() {
     $(document).on('click', '.text-format-option', showTextFormatOptions)
 
     $(document).on('click', '.chapter-toc', scrollToChapter);
+
+    $(document).on('click', '.style-btn-container', styleBtnContainerClickCallBack)
 })
+
+function styleBtnContainerClickCallBack(e) {
+    toggleFootnotePopup('hide');
+}
 
 function scrollToChapter(e) {
     var ele = $(e.target),
@@ -200,12 +206,14 @@ function showTextFormatOptions(e) {
 }
 
 function showTableOfContent(e) {
+
     $('.table-of-content').show();
     $('.text-format').hide();
     $('.option-expanded').fadeIn();
 }
 
 function toggleReadingOptions(e) {
+    toggleFootnotePopup('hide');
     $('.style-btn-container').fadeIn();
 }
 
