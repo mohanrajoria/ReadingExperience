@@ -1,13 +1,5 @@
-// done : break view port logic
-// done : find cid of first element
-// todo : ajax url and request handler normalization
-// done : maintain Viweport content on line height change and font size change
-// done : toc
-// done : footnotes handling
-// done : blockquote handling
-// done : find content in viewport : login change to binary search...
-// ...filhaal toh ita hi hai...
 screenOverlayHandler({action : 'show', type : 'page-loading'});
+
 var __BASE_URL__ = "https://app.juggernaut.in/";
 var __USER_ID__ = "";//"3783332750f049d897092288d1566f6c";
 var __BOOK_ID__ = "";//"cd08fbd152e142a095107568a7c71659";
@@ -125,7 +117,6 @@ $(document).ready(function() {
     /** Validate user function : get userId and bookId from url,
     if exist and verified via ajax call to server
     Callback will be triggered **/
-
     validateUserForBook(function() {
         toggleFootnotePopup('hide');
         getSavedUserPreferences();
@@ -168,29 +159,37 @@ $(document).ready(function() {
     /** Chapter parent container click event : callback to handle hide show popups etc. **/
     $(document).on('click', _chapter_parent_container_selector_, chapterParentContainerClickCallback);
 
-    /** Font size change event **/
+    /** Trigger footnote popup event **/
     $(document).on('click', 'fnote.footnote-activator', footnoteTriggerCallback)
 
+    /** Show reading options event **/
     $(document).on('click', '#option-trigger-btn', toggleReadingOptions)
 
+    /** Show Table of content event **/
     $(document).on('click', '.toc-option', showTableOfContent)
 
+    /** show text formatting options event **/
     $(document).on('click', '.text-format-option', showTextFormatOptions)
 
+    /** chapter click in table of content event **/
     $(document).on('click', '.chapter-toc', scrollToChapter);
 
+    /** reading options container clicked event **/
     $(document).on('click', '.style-btn-container', styleBtnContainerClickCallBack);
 
-    $( window ).resize(function() {
+    /** Window resize event : check visible pages and load content **/
+    $(window).resize(function() {
         scrollEndCallBack();
         scrollingCallBack();
     });
 })
 
+/** reading option container clicked callback : if any popup visible hide etc. **/
 function styleBtnContainerClickCallBack(e) {
     toggleFootnotePopup('hide');
 }
 
+/** Scroll to a given chapter in reading view **/
 function scrollToChapter(e) {
     var ele = $(e.target),
         id,
@@ -214,12 +213,14 @@ function scrollToChapter(e) {
 
 }
 
+/** text formatting options btn cliked **/
 function showTextFormatOptions(e) {
     $('.table-of-content').hide();
     $('.text-format').show();
     $('.option-expanded').fadeIn();
 }
 
+/** TOC triggered **/
 function showTableOfContent(e) {
 
     $('.table-of-content').show();
@@ -227,11 +228,13 @@ function showTableOfContent(e) {
     $('.option-expanded').fadeIn();
 }
 
+/** show/hide reading options **/
 function toggleReadingOptions(e) {
     toggleFootnotePopup('hide');
     $('.style-btn-container').fadeIn();
 }
 
+/** reading container clicked : some handling like hiding popups and closing reading options etc. **/
 function chapterParentContainerClickCallback(e) {
     var targetElement = $(e.target),
         isFootnoteVisible = $(_footnote_popup_selector_).css('display');
@@ -244,6 +247,7 @@ function chapterParentContainerClickCallback(e) {
     $('.style-btn-container, .option-expanded, .table-of-content, .text-format').hide();
 }
 
+/** text formatting btns : on click change style **/
 function updateIconStyle(dataObj) {
     if(!dataObj || !dataObj.value) return;
 
@@ -259,6 +263,7 @@ function updateIconStyle(dataObj) {
     }
 }
 
+/** Line height modification as argument passed **/
 function modifyLineHeight(lineHeight) {
     var obj = {
         selector : _chapter_parent_container_selector_,
@@ -272,6 +277,7 @@ function modifyLineHeight(lineHeight) {
     modifyClassesForSelector(obj);
 }
 
+/** Font size modification as argument passed **/
 function modifyFontSize(fontSize) {
     var obj = {
         selector : _chapter_parent_container_selector_,
@@ -285,6 +291,7 @@ function modifyFontSize(fontSize) {
     modifyClassesForSelector(obj);
 }
 
+/** Background color modification as argument passed **/
 function modifyBackgroundColor(bgColor) {
     var obj = {
         selector : _chapter_parent_container_selector_,
@@ -300,6 +307,7 @@ function modifyBackgroundColor(bgColor) {
     modifyClassesForSelector(obj);
 }
 
+/** Update/remove classes a/c to the passed info **/
 function modifyClassesForSelector(dataObj) {
     var selector = dataObj.selector,
         classToAdd = dataObj.classToAdd,
@@ -311,6 +319,7 @@ function modifyClassesForSelector(dataObj) {
     }
 }
 
+/** Updating background color for all the elements as reading background changed by user **/
 function updateBGColorForReadingOptions(color) {
     var eleSelector = ".option-trigger-btn, .style-btn-container, #tooltip-container";
     if(color === 'black') {
@@ -320,6 +329,7 @@ function updateBGColorForReadingOptions(color) {
     }
 }
 
+/** on scroll check and save first element in viewport and current scroll position **/
 function saveCurrentScrollAndFirstElement(dataObj, visibleContentInViewPort) {
     var windowScroll = $(_chapter_parent_container_selector_).scrollTop(),
         visibleFirstElementDetail = topMostContentIdInViewport({viewportVisibleContentInfo : visibleContentInViewPort});
@@ -335,6 +345,7 @@ function saveCurrentScrollAndFirstElement(dataObj, visibleContentInViewPort) {
     dataObj.scrollPosition = windowScroll;
 }
 
+/** Maintain visible content position as user changes font size, line height etc. **/
 function maintainVisibleViewportContentsPosition(dataObj) {
     var parentContainerSelector = _chapter_parent_container_selector_,
         currentWindowScroll = getScrollPosition({selector : parentContainerSelector}),
@@ -362,12 +373,14 @@ function maintainVisibleViewportContentsPosition(dataObj) {
     scrollToGivenElement({selector : parentContainerSelector, scrollTop : windowScrollPositionToUpdate});
 }
 
+/** Get scroll position for given element **/
 function getScrollPosition(dataObj) {
     var selector = dataObj.selector;
     if(selector)
         return $(selector).scrollTop();
 }
 
+/** update css styling for given elements as selector **/
 function modifyStyleOfSelectors(dataObj) {
     var selector = dataObj.selector;
     var style = dataObj.styles;
@@ -376,16 +389,18 @@ function modifyStyleOfSelectors(dataObj) {
 
 }
 
+/** Reading view scrolling call back to update page number etc... **/
 function scrollingCallBack(e) {
     showPageNumber(e);
     toggleFootnotePopup('hide');
 }
 
+/** Binding reading container with scroll event **/
 function bindChapterContainerOnScroll(callBack) {
     $(_chapter_parent_container_selector_).scroll(callBack);
 }
 
-/** Binding scroll end event in reading main container***/
+/** Binding scroll end event in reading main container **/
 function bindChapterContainerScrollEnd(callBack) {
     $.fn.scrollEnd = function(callback, timeout) {
         $(this).scroll(function(){
@@ -400,7 +415,7 @@ function bindChapterContainerScrollEnd(callBack) {
     $(_chapter_parent_container_selector_).scrollEnd(callBack, 50);
 }
 
-/** This will initiate getting pages call **/
+/** When scroll stops do required things such as getting pages, updating content etc... **/
 function scrollEndCallBack() {
     // var viewportVisibleContentInfo = viewportVisibleContentInfo ? viewportVisibleContentInfo : {pageNumberList : []};
     var viewportVisibleContentInfo = getSegmentsInViewPort();
@@ -418,6 +433,7 @@ function scrollEndCallBack() {
     saveCurrentScrollAndFirstElement(_visible_viewport_element_obj_, viewportVisibleContentInfo);
 }
 
+/** Get all visible pages in view port wrapper (removing duplicates etc.) **/
 function getSegmentsInViewPort() {
     var chapterParentContainerScrollPos = $(_chapter_parent_container_selector_).scrollTop(),
         firstElement = 1,
@@ -435,6 +451,7 @@ function getSegmentsInViewPort() {
     return {pageNumberList : visiblePageNumbers, firstVisiblePage : firstVisiblePageNumber};
 }
 
+/** Getting all pages in view port, while first visible page is given **/
 function getAllPagesInViewPort(firstPageNumber) {
     var visiblePageNumbers = [],
         windowHeight = window.innerHeight;
@@ -454,6 +471,7 @@ function getAllPagesInViewPort(firstPageNumber) {
     return visiblePageNumbers;
 }
 
+/** Update first page number in viewport to the page number circle on bottom **/
 function showPageNumber(e) {
     var firstVisiblePageNumber = getFirstVisibleElementWhileScrolling();
     if(firstVisiblePageNumber) {
@@ -461,6 +479,7 @@ function showPageNumber(e) {
     }
 }
 
+/** First visible element in viewport while still scrolling **/
 function getFirstVisibleElementWhileScrolling() {
     var chapterParentContainerScrollPos = $(_chapter_parent_container_selector_).scrollTop(),
         firstVisiblePageNumber = firstPageInViewPort(1, _max_page_number_, chapterParentContainerScrollPos);
@@ -468,6 +487,7 @@ function getFirstVisibleElementWhileScrolling() {
     return firstVisiblePageNumber;
 }
 
+/** Check and find first visible element in viewport using binary search **/
 function firstPageInViewPort(low, high, windowScrollPos) {
     // todo : task is to find nearest minimum offsetTop wala element...
     var windowHeight = window.innerHeight;
@@ -506,6 +526,7 @@ function firstPageInViewPort(low, high, windowScrollPos) {
     }
 }
 
+/** Find first visible C tag in viewport **/
 function topMostContentIdInViewport(dataObj) {
     var chapterParentContainerScrollPos = $(_chapter_parent_container_selector_).scrollTop(),
         windowHeight = window.innerHeight,
@@ -547,7 +568,7 @@ function topMostContentIdInViewport(dataObj) {
 
 /** Not in use abhi **/
 function getUserCreds() {
-
+    // todo : get user creds if required
 }
 
 /** Not in use abhi **/
@@ -583,6 +604,7 @@ function validateUserForBook(callBack) {
     }
 }
 
+/** show/hide reading container while loading or in case we get an erro **/
 function parentReadingContainerToggle(action) {
     if(action === 'show')
         $('#reading-parent-container').removeClass('in-active');
@@ -801,6 +823,7 @@ function buildTOC(data) {
     })
 }
 
+/** adding a single chapter in Table of content **/
 function updateChapterInTOC(data) {
     if(!data) return;
     if(data.chType === 1) {
@@ -812,6 +835,7 @@ function updateChapterInTOC(data) {
     }
 }
 
+/** Formatting chapter content for TOC and return a html string to update **/
 function getChapterStringToAppendInTOC(dataObj) {
     if(!dataObj) return "";
 
@@ -978,12 +1002,7 @@ function updateUserPreferences(dataObj) {
 
 /** Not in use abhi **/
 function getUserBookHighlights() {
-
-}
-
-/** Not in use abhi **/
-function scrollToGivenPosition() {
-
+    // todo : get book highlights
 }
 
 /** Scroll a given element to given position **/
@@ -1021,19 +1040,19 @@ function apiService(dataObj) {
 
 }
 
+/** URL mapper for apis **/
 function apiURLMapper() {
-
+    // todo : further optimizations
 }
 
+/** Ajax error handler **/
 function errorHandler(dataObj) {
     if(dataObj.errorType === 'API') {
         var statusCode = dataObj.data.status;
         if(statusCode === 403) {
             screenOverlayHandler({action : 'show', type : 'error', msg : 'Oops! You are not allowed to access this page.'});
-            // showPopup({msg : 'Oops! You are not authorized to access this page.', type : 'error'});
         } else if(statusCode === 500) {
             screenOverlayHandler({action : 'show', type : 'error', msg : 'Oops! Something went wrong, please be with us and try again.'});
-            // showPopup({msg : 'Oops! Something went wrong, please be with us and try again.', type : 'error'});
         } else if(statusCode === 400) {
             screenOverlayHandler({action : 'show', type : 'error', msg : 'Oops! Something went wrong, please be with us and try again.'});
         } else if(statusCode === 404) {
@@ -1046,10 +1065,7 @@ function errorHandler(dataObj) {
     }
 }
 
-function showPopup(dataObj) {
-    alert(dataObj.msg);
-}
-
+/** Calculation for footnote popup position and showing and scrolling if needed **/
 function footnoteTriggerCallback(e) {
     var footnoteId = $(e.target).attr('id'),
         footnoteDetailObj,
@@ -1126,6 +1142,7 @@ function footnoteTriggerCallback(e) {
     }, animateFootnotePopupTimeout + 100);
 }
 
+/** Toggling footnote popup... i mean show/hide :p **/
 function toggleFootnotePopup(action) {
     if(action === 'show') {
         $(_footnote_popup_selector_).fadeIn();
@@ -1135,6 +1152,7 @@ function toggleFootnotePopup(action) {
     }
 }
 
+/** updating given html content to footnote popup **/
 function updateFootnotePopupContent(dataObj) {
     var id = dataObj.footnoteId,
         footnoteData = _all_footnotes_data_[id],
