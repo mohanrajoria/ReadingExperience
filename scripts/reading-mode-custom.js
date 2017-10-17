@@ -121,6 +121,11 @@ var _all_images_data_ = {},
     };
 
 $(document).ready(function() {
+
+    /** Validate user function : get userId and bookId from url,
+    if exist and verified via ajax call to server
+    Callback will be triggered **/
+
     validateUserForBook(function() {
         toggleFootnotePopup('hide');
         getSavedUserPreferences();
@@ -129,6 +134,7 @@ $(document).ready(function() {
         bindChapterContainerOnScroll(scrollingCallBack);
     })
 
+    /** Font size change event **/
     $(document).on('click', '.font-size-update', function(e) {
         var fontSizeAttr = 'data-font-size';
         var fontSize = e.target.getAttribute(fontSizeAttr);
@@ -139,6 +145,7 @@ $(document).ready(function() {
         }
     })
 
+    /** Line height change event **/
     $(document).on('click', '.line-height-update', function(e) {
         var lineHeightAttr = 'data-line-height';
         var lineHeight = e.target.getAttribute(lineHeightAttr);
@@ -149,6 +156,7 @@ $(document).ready(function() {
         }
     })
 
+    /** Background color change event **/
     $(document).on('click', '.background-color-update', function(e) {
         var backgroundColorAttr = 'data-background-color';
         var backgroundColor = e.target.getAttribute(backgroundColorAttr);
@@ -157,8 +165,10 @@ $(document).ready(function() {
         }
     })
 
+    /** Chapter parent container click event : callback to handle hide show popups etc. **/
     $(document).on('click', _chapter_parent_container_selector_, chapterParentContainerClickCallback);
 
+    /** Font size change event **/
     $(document).on('click', 'fnote.footnote-activator', footnoteTriggerCallback)
 
     $(document).on('click', '#option-trigger-btn', toggleReadingOptions)
