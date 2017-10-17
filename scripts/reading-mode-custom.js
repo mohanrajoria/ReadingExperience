@@ -169,7 +169,12 @@ $(document).ready(function() {
 
     $(document).on('click', '.chapter-toc', scrollToChapter);
 
-    $(document).on('click', '.style-btn-container', styleBtnContainerClickCallBack)
+    $(document).on('click', '.style-btn-container', styleBtnContainerClickCallBack);
+
+    $( window ).resize(function() {
+        scrollEndCallBack();
+        scrollingCallBack();
+    });
 })
 
 function styleBtnContainerClickCallBack(e) {
