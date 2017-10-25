@@ -1,9 +1,10 @@
 screenOverlayHandler({action : 'show', type : 'page-loading'});
 
-var __BASE_URL__ = "https://app.juggernaut.in/";
-var __USER_ID__ = "";//"3783332750f049d897092288d1566f6c";
-var __BOOK_ID__ = "";//"cd08fbd152e142a095107568a7c71659";
-var __AUTH_TOKEN__ = "451dcb0916904a0caadab926a96a1944";
+var __BASE_URL__ = "http://ac2d5c6c.ngrok.io/";//"http://gateway.staging.juggernaut.in/";//"https://app.juggernaut.in/";
+    __USER_ID__ = "";//"3783332750f049d897092288d1566f6c";
+    __BOOK_ID__ = "";//"cd08fbd152e142a095107568a7c71659";
+    __AUTH_TOKEN__ = "Bearer RLYTUIII12ADBF";
+    __CLIENT_NAME__ = "";
 
 var _all_images_data_ = {},
     _all_footnotes_data_ = {},
@@ -178,7 +179,11 @@ $(document).ready(function() {
     $(document).on('click', '.style-btn-container', styleBtnContainerClickCallBack);
 
     /** Window resize event : check visible pages and load content **/
-    $(window).resize(function() {
+    $(window).resize(function(e) {
+        if($('#reading-parent-container').hasClass('in-active')) {
+            return;
+        }
+
         scrollEndCallBack();
         scrollingCallBack();
     });
@@ -575,7 +580,8 @@ function getUserCreds() {
 function validateUserForBook(callBack) {
     var queryParams = location.search,
         parsedParams = queryParams.split('&'),
-        userId, bookId;
+        userId, bookId,
+        validClients = ['railyatri'];
 
     parsedParams.forEach(function(par, ind) {
         if(par.indexOf('user_id') != -1) {
@@ -584,8 +590,16 @@ function validateUserForBook(callBack) {
         } else if(par.indexOf('book_id') != -1) {
             var arr = par.split('book_id=');
             bookId = arr[arr.length - 1];
+        } else if(par.indexOf('guest') != -1) {
+            var arr = par.split('guest=');
+            clientName = arr[arr.length - 1];
         }
     })
+
+    if(validClients.indexOf(clientName) === -1) {
+        screenOverlayHandler({action : 'show', type : 'error', msg : 'Oops! You are not allowed to access this page.'});
+        return;
+    }
 
     if(userId && bookId) {
         // todo : make an ajax call and verify
@@ -593,6 +607,7 @@ function validateUserForBook(callBack) {
         if(validate === 'success') {
             __USER_ID__ = userId;
             __BOOK_ID__ = bookId;
+            __CLIENT_NAME__ = clientName;
             // todo : setAuthToken over here
             parentReadingContainerToggle('show');
             callBack();
@@ -612,14 +627,57 @@ function parentReadingContainerToggle(action) {
         $('#reading-parent-container').addClass('in-active');
 }
 
+/** URL mapper ***/
+
+function ajaxUrlGetter(dataObj) {
+    var reqUrl = "";
+    if(!dataObj) return reqUrl;
+
+    if(!isReqArgumentsPresent(dataObj)) return reqUrl;
+
+    if(dataObj.reqType === 'getChapters') {
+        reqUrl = __BASE_URL__ + "yatri/user/" + dataObj.userId + "/book/" + dataObj.bookId + "/read/";
+    } else if(dataObj.reqType === 'getPages') {
+        reqUrl = __BASE_URL__ + "yatri/user/" + dataObj.userId + "/book/" + dataObj.bookId + "/read/pages/?" + dataObj.pageStr;
+    } else {
+
+    }
+
+    return reqUrl;
+}
+
+/** All arguments for ajax url mapping validator **/
+function isReqArgumentsPresent(dataObj) {
+    if(!dataObj) return false;
+
+    var isValidArgs = true;
+
+    var reqParams = {
+        getChapters : ['userId', 'bookId'],
+        getPages : ['userId', 'bookId', 'pagesStr']
+    }
+
+    var reqType = dataObj.reqType;
+    var reqArgs = reqParams[reqType];
+
+    reqArgs.forEach(function(a, i) {
+        if(!dataObj[a]) isValidArgs = false;
+    });
+
+    return isValidArgs;
+}
+
 /** Fetch all the chapters for this book **/
 function getChapters(callback) {
-    var getChapterUrl = __BASE_URL__ + "users/" + __USER_ID__ + "/books/" + __BOOK_ID__ + "/read/";
+    var getChapterUrl = ajaxUrlGetter({reqType : 'getChapters', userId : __USER_ID__, bookId : __BOOK_ID__});
+
+    if(!getChapterUrl) return;
+
     $.ajax({
         url : getChapterUrl,
         method : "GET",
         headers : {
-            Authorization : "Basic " + __AUTH_TOKEN__
+            Authorization : __AUTH_TOKEN__
         },
         success : function(data, status){
             if(data) {
@@ -681,7 +739,10 @@ function updateArray(newList, currentList, action) {
 function getSegments(pageIds, formatPagesDetailCallBack) {
     var pageIds = pageIds.sort();
     var pagesIdString = arrayToPageIdString(pageIds);
-    var getSegmentsUrl = __BASE_URL__ + "users/" + __USER_ID__ + "/books/" + __BOOK_ID__ + "/read/pages/" + (pagesIdString ? "?" + pagesIdString : "");
+
+    var getSegmentsUrl = ajaxUrlGetter({userId : __USER_ID__, bookId : __BOOK_ID__, pageStr : pagesIdString, reqType : 'getPages'})
+
+    if(!getSegmentsUrl) return;
 
     if(pageIds.length > 0) {
         $.ajax({
