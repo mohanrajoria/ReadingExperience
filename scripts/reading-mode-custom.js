@@ -1,8 +1,8 @@
 screenOverlayHandler({action : 'show', type : 'page-loading'});
 
-var __BASE_URL__ = "http://ac2d5c6c.ngrok.io/";//"http://gateway.staging.juggernaut.in/";//"https://app.juggernaut.in/";
-    __USER_ID__ = "";//"3783332750f049d897092288d1566f6c";
-    __BOOK_ID__ = "";//"cd08fbd152e142a095107568a7c71659";
+var __BASE_URL__ = "http://gateway.staging.juggernaut.in/";
+    __USER_ID__ = "";
+    __BOOK_ID__ = "";
     __AUTH_TOKEN__ = "Bearer RLYTUIII12ADBF";
     __CLIENT_NAME__ = "";
 
@@ -654,7 +654,7 @@ function isReqArgumentsPresent(dataObj) {
 
     var reqParams = {
         getChapters : ['userId', 'bookId'],
-        getPages : ['userId', 'bookId', 'pagesStr']
+        getPages : ['userId', 'bookId', 'pageStr']
     }
 
     var reqType = dataObj.reqType;
@@ -749,7 +749,7 @@ function getSegments(pageIds, formatPagesDetailCallBack) {
             url : getSegmentsUrl,
             method : "GET",
             headers : {
-                Authorization : "Basic " + __AUTH_TOKEN__
+                Authorization : __AUTH_TOKEN__
             },
             success : function(data, status){
                 if(data) {
