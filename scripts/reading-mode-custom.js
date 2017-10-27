@@ -580,7 +580,7 @@ function getUserCreds() {
 function validateUserForBook(callBack) {
     var queryParams = location.search,
         parsedParams = queryParams.split('&'),
-        userId, bookId,
+        userId, bookId, clientName,
         validClients = ['railyatri'];
 
     parsedParams.forEach(function(par, ind) {
@@ -597,7 +597,7 @@ function validateUserForBook(callBack) {
     })
 
     if(validClients.indexOf(clientName) === -1) {
-        screenOverlayHandler({action : 'show', type : 'error', msg : 'Oops! You are not allowed to access this page.'});
+        screenOverlayHandler({action : 'show', type : 'error', msg : 'Oops! You are trying to access invalid url.'});
         return;
     }
 
@@ -612,10 +612,10 @@ function validateUserForBook(callBack) {
             parentReadingContainerToggle('show');
             callBack();
         } else {
-            screenOverlayHandler({action : 'show', type : 'error', msg : 'Oops! You are not allowed to access this page.'});
+            screenOverlayHandler({action : 'show', type : 'error', msg : 'Oops! You are trying to access invalid url.'});
         }
     } else {
-        screenOverlayHandler({action : 'show', type : 'error', msg : 'Oops! You have reached to a wrong url, please check and try again.'});
+        screenOverlayHandler({action : 'show', type : 'error', msg : 'Oops! You are trying to access invalid url.'});
     }
 }
 
