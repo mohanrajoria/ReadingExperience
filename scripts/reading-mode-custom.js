@@ -597,7 +597,7 @@ function validateUserForBook(callBack) {
     })
 
     if(validClients.indexOf(clientName) === -1) {
-        screenOverlayHandler({action : 'show', type : 'error', msg : 'Oops! You are trying to access invalid url.'});
+        screenOverlayHandler({action : 'show', type : 'error', msg : 'Oops! You are not a authorized guest user.'});
         return;
     }
 
@@ -615,7 +615,12 @@ function validateUserForBook(callBack) {
             screenOverlayHandler({action : 'show', type : 'error', msg : 'Oops! You are trying to access invalid url.'});
         }
     } else {
-        screenOverlayHandler({action : 'show', type : 'error', msg : 'Oops! You are trying to access invalid url.'});
+        if(!userId)
+            screenOverlayHandler({action : 'show', type : 'error', msg : 'Oops! You are not a valid user to access this url.'});
+        else if(!bookId)
+            screenOverlayHandler({action : 'show', type : 'error', msg : 'Oops! Book you want to read does not exist.'});
+        else
+            screenOverlayHandler({action : 'show', type : 'error', msg : 'Oops! You are trying to access invalid url.'});
     }
 }
 
