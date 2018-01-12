@@ -1,7 +1,7 @@
 #reading-parent-container.in-active{
     display: none;
 }
-#chapter-parent-container {
+.chapter-parent-container {
     height: 100vh;
     max-height: 100vh;
     min-height: 100vh;
@@ -9,11 +9,11 @@
     padding : 0px;
 }
 
-#chapter-parent-container .chapter-container {
+.chapter-parent-container .chapter-container {
     /*height: 300px;*/
 }
 
-#chapter-parent-container .chapter-container .chapter-segment-container {
+.chapter-parent-container .chapter-container .chapter-segment-container {
 
 }
 
@@ -24,7 +24,7 @@
     border-radius: 4px;
     background-color: #e4e4e4;
 }
-#chapter-parent-container::-webkit-scrollbar-track
+.chapter-parent-container::-webkit-scrollbar-track
 {
 	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
 	border-radius: 4px;
@@ -36,7 +36,7 @@
     width: 0px;
 	background-color: #e4e4e4;
 }
-#chapter-parent-container::-webkit-scrollbar
+.chapter-parent-container::-webkit-scrollbar
 {
 	width: 0px;
 	background-color: #e4e4e4;
@@ -48,7 +48,7 @@
 	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
 	background-color: #4d4d4d;
 }
-#chapter-parent-container::-webkit-scrollbar-thumb
+.chapter-parent-container::-webkit-scrollbar-thumb
 {
 	border-radius: 4px;
 	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
@@ -102,49 +102,49 @@ img.middle-size{
 Chapter content styling : common text styling and formatting across themes, add below
 **
 **/
-#chapter-parent-container .chapter-segment-placeholder {
+.chapter-parent-container .chapter-segment-placeholder {
     background-image: url("../images/segment_placeholder.png");
     background-repeat: no-repeat;
     background-position: 50% 50%;
     height: 400px;
 }
 
-#chapter-parent-container .chapter-segment-container,
-#chapter-parent-container .chapter-heading-container{
+.chapter-parent-container .chapter-segment-container,
+.chapter-parent-container .chapter-heading-container{
     padding: 0px 20px;
 }
 
-#chapter-parent-container .chapter-heading-container{
+.chapter-parent-container .chapter-heading-container{
     margin-top: 60px;
 }
 
-#chapter-parent-container .chapter-heading-container .chapter-name,
-#chapter-parent-container .chapter-heading-container .chapter-number{
+.chapter-parent-container .chapter-heading-container .chapter-name,
+.chapter-parent-container .chapter-heading-container .chapter-number{
     font-size: 26px;
     color: #ff4546;
     margin-bottom: 10px;
 }
-#chapter-parent-container .chapter-heading-container .chapter-ornament{
+.chapter-parent-container .chapter-heading-container .chapter-ornament{
     width: 32px;
     height: 10px;
     display: inline-block;
     margin-top: 20px;
 }
 
-#chapter-parent-container .chapter-segment-container p {
+.chapter-parent-container .chapter-segment-container p {
     margin-bottom: 15px;
     font-family: "Charter",sans-serif;
     word-wrap: break-word;
 }
 
-#chapter-parent-container .chapter-segment-container ol, ul{
+.chapter-parent-container .chapter-segment-container ol, ul{
     list-style-type: decimal;
     list-style-position: inside;
     padding-left: 40px;
     word-wrap: break-word;
 }
 
-#chapter-parent-container .chapter-segment-container ol li, ul li{
+.chapter-parent-container .chapter-segment-container ol li, ul li{
     list-style-type: decimal;
     color: #333;
     font-family: "Charter",sans-serif;
@@ -153,21 +153,21 @@ Chapter content styling : common text styling and formatting across themes, add 
     line-height: 30px;*/
 }
 
-#chapter-parent-container .chapter-segment-container img{
+.chapter-parent-container .chapter-segment-container img{
     width: 100%;
     height: auto;
     margin: 40px 0;
     display: block;
 }
 
-#chapter-parent-container .chapter-segment-container blockquote {
+.chapter-parent-container .chapter-segment-container blockquote {
     color: #ff4646;
     font-family: "Charter", sans-serif;
     padding: 20px 100px 30px 10px;
     font-style: italic;
     word-wrap: break-word;
 }
-#chapter-parent-container .chapter-segment-container fnote.footnote-activator {
+.chapter-parent-container .chapter-segment-container fnote.footnote-activator {
     width: 20px;
     content: url(../images/footnote.png);
     cursor: pointer;
@@ -176,7 +176,7 @@ Chapter content styling : common text styling and formatting across themes, add 
 }
 
 /*
-#chapter-parent-container .chapter-segment-container p {
+.chapter-parent-container .chapter-segment-container p {
     font-size: 18px;
     line-height: 27px;
 }
@@ -193,30 +193,30 @@ Chapter content styling : common text styling and formatting across themes, add 
 **/
 
 
-.black-BG-theme#chapter-parent-container{
+.black-BG-theme.chapter-parent-container{
     background-color: rgba(0, 0, 0, 1);
 }
-.grey-BG-theme#chapter-parent-container{
+.grey-BG-theme.chapter-parent-container{
     background-color: rgba(245, 245, 245, 1);
 }
-.biege-BG-theme#chapter-parent-container{
+.biege-BG-theme.chapter-parent-container{
     background-color: rgba(255, 248, 238, 1);
 }
-.white-BG-theme#chapter-parent-container{
+.white-BG-theme.chapter-parent-container{
     background-color: rgba(255, 255, 255, 1);
 }
 
-.black-BG-theme#chapter-parent-container p,
-.black-BG-theme#chapter-parent-container ul li,
-.black-BG-theme#chapter-parent-container ol li{
+.black-BG-theme.chapter-parent-container p,
+.black-BG-theme.chapter-parent-container ul li,
+.black-BG-theme.chapter-parent-container ol li{
     color: white;
 }
-.black-BG-theme#chapter-parent-container .chapter-heading-container .chapter-ornament{
+.black-BG-theme.chapter-parent-container .chapter-heading-container .chapter-ornament{
     background: url("../images/readimg_pase_light.png") no-repeat;
 }
-.grey-BG-theme#chapter-parent-container .chapter-heading-container .chapter-ornament,
-.white-BG-theme#chapter-parent-container .chapter-heading-container .chapter-ornament,
-.biege-BG-theme#chapter-parent-container .chapter-heading-container .chapter-ornament{
+.grey-BG-theme.chapter-parent-container .chapter-heading-container .chapter-ornament,
+.white-BG-theme.chapter-parent-container .chapter-heading-container .chapter-ornament,
+.biege-BG-theme.chapter-parent-container .chapter-heading-container .chapter-ornament{
     background: url("../images/readimg_pase_dark.png") no-repeat;
 }
 
@@ -225,47 +225,47 @@ Chapter content styling : common text styling and formatting across themes, add 
 * .font-size-medium, .font-size-small, .font-size-large
 **/
 
-.line-height-small#chapter-parent-container p,
-.line-height-small#chapter-parent-container ul,
-.line-height-small#chapter-parent-container ol,
-.line-height-small#chapter-parent-container ul li,
-.line-height-small#chapter-parent-container ol li{
+.line-height-small.chapter-parent-container p,
+.line-height-small.chapter-parent-container ul,
+.line-height-small.chapter-parent-container ol,
+.line-height-small.chapter-parent-container ul li,
+.line-height-small.chapter-parent-container ol li{
     line-height: 27px;
 }
-.line-height-medium#chapter-parent-container p,
-.line-height-medium#chapter-parent-container ul li,
-.line-height-medium#chapter-parent-container ol li{
+.line-height-medium.chapter-parent-container p,
+.line-height-medium.chapter-parent-container ul li,
+.line-height-medium.chapter-parent-container ol li{
     line-height: 30px;
 }
-.line-height-large#chapter-parent-container p,
-.line-height-large#chapter-parent-container ul li,
-.line-height-large#chapter-parent-container ol li{
+.line-height-large.chapter-parent-container p,
+.line-height-large.chapter-parent-container ul li,
+.line-height-large.chapter-parent-container ol li{
     line-height: 33px;
 }
 
-.font-size-xsmall#chapter-parent-container p,
-.font-size-xsmall#chapter-parent-container ul li,
-.font-size-xsmall#chapter-parent-container ol li{
+.font-size-xsmall.chapter-parent-container p,
+.font-size-xsmall.chapter-parent-container ul li,
+.font-size-xsmall.chapter-parent-container ol li{
     font-size: 16px;
 }
-.font-size-small#chapter-parent-container p,
-.font-size-small#chapter-parent-container ul li,
-.font-size-small#chapter-parent-container ol li{
+.font-size-small.chapter-parent-container p,
+.font-size-small.chapter-parent-container ul li,
+.font-size-small.chapter-parent-container ol li{
     font-size: 18px;
 }
-.font-size-medium#chapter-parent-container p,
-.font-size-medium#chapter-parent-container ul li,
-.font-size-medium#chapter-parent-container ol li{
+.font-size-medium.chapter-parent-container p,
+.font-size-medium.chapter-parent-container ul li,
+.font-size-medium.chapter-parent-container ol li{
     font-size: 20px;
 }
-.font-size-large#chapter-parent-container p,
-.font-size-large#chapter-parent-container ul li,
-.font-size-large#chapter-parent-container ol li{
+.font-size-large.chapter-parent-container p,
+.font-size-large.chapter-parent-container ul li,
+.font-size-large.chapter-parent-container ol li{
     font-size: 22px;
 }
-.font-size-xlarge#chapter-parent-container p,
-.font-size-xlarge#chapter-parent-container ul li,
-.font-size-xlarge#chapter-parent-container ol li{
+.font-size-xlarge.chapter-parent-container p,
+.font-size-xlarge.chapter-parent-container ul li,
+.font-size-xlarge.chapter-parent-container ol li{
     font-size: 24px;
 }
 
