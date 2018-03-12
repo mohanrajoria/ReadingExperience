@@ -194,23 +194,44 @@ Chapter content styling : common text styling and formatting across themes, add 
 
 
 .black-BG-theme.chapter-parent-container{
-    background-color: rgba(0, 0, 0, 1);
+    /* background-color: rgba(0, 0, 0, 1); */
+    background-color: rgba(31, 31, 31, 1);
 }
 .grey-BG-theme.chapter-parent-container{
     background-color: rgba(245, 245, 245, 1);
 }
 .biege-BG-theme.chapter-parent-container{
-    background-color: rgba(255, 248, 238, 1);
+    /* Juggernaut biege color  */
+    /* background-color: rgba(255, 248, 238, 1); */
+
+    /* Kindle sephia color */
+    background-color: rgba(231, 222, 199, 1);
 }
 .white-BG-theme.chapter-parent-container{
     background-color: rgba(255, 255, 255, 1);
 }
 
+.white-BG-theme.chapter-parent-container p,
+.white-BG-theme.chapter-parent-container ul li,
+.white-BG-theme.chapter-parent-container ol li{
+    /* color: white; */
+    color : #4D4D4D;
+}
+
 .black-BG-theme.chapter-parent-container p,
 .black-BG-theme.chapter-parent-container ul li,
 .black-BG-theme.chapter-parent-container ol li{
-    color: white;
+    /* color: white; */
+    color : #d6d6d6;
 }
+
+.biege-BG-theme.chapter-parent-container p,
+.biege-BG-theme.chapter-parent-container ul li,
+.biege-BG-theme.chapter-parent-container ol li{
+    /* color: white; */
+    color : rgba(93, 66, 50, 1);
+}
+
 .black-BG-theme.chapter-parent-container .chapter-heading-container .chapter-ornament{
     background: url("../images/readimg_pase_light.png") no-repeat;
 }
@@ -322,11 +343,15 @@ Chapter content styling : common text styling and formatting across themes, add 
 /** tooltip **/
 .background-white#tooltip-container{
     background-color: white;
-    color: black;
+    /* color: black; */
+    color : #4d4d4d;
 }
 .background-black#tooltip-container{
-    background-color: black;
-    color: white;
+    /* background-color: black; */
+    /* color: white; */
+
+    background-color: rgba(31, 31, 31, 1);
+
 }
 #tooltip-container{
     position: fixed;
@@ -354,7 +379,8 @@ Chapter content styling : common text styling and formatting across themes, add 
     border-right: none;
 }
 #option-trigger-btn.background-black{
-    background-color: black;
+    /* background-color: black; */
+    background-color: rgba(31, 31, 31, 1);
     border: 1px solid white;
     border-right: none;
 }
@@ -382,7 +408,8 @@ Chapter content styling : common text styling and formatting across themes, add 
     background-color: white;
 }
 .style-btn-container.background-black{
-    background-color: black;
+    /* background-color: black; */
+    background-color: rgba(31, 31, 31, 1);
 }
 
 .option-expanded{
@@ -413,7 +440,8 @@ Chapter content styling : common text styling and formatting across themes, add 
     background-color: white;
 }
 .background-black .option-expanded{
-    background-color: black;
+    /* background-color: black; */
+    background-color: rgba(31, 31, 31, 1);
 }
 
 .option-container{
@@ -426,7 +454,8 @@ Chapter content styling : common text styling and formatting across themes, add 
     background-color: white;
 }
 .background-black .option-container {
-    background-color: black;
+    /* background-color: black; */
+    background-color: rgba(31, 31, 31, 1);
 }
 /*
 .option-types{
@@ -566,16 +595,24 @@ Chapter content styling : common text styling and formatting across themes, add 
     color: black;
 }
 .background-color-update.black{
-    background-color: rgba(0, 0, 0, 1);
-    color: white;
+    /* background-color: rgba(0, 0, 0, 1); */
+    /* color: white;  */
+
+    background-color: rgba(31, 31, 31, 1);
+    color : #d6d6d6;
 }
 .background-color-update.grey{
     background-color: rgba(245, 245, 245, 1);
     color: black;
 }
 .background-color-update.biege{
-    background-color: rgba(255, 248, 238, 1);
-    color: black;
+    /* Juggernaut color theme */
+    /* background-color: rgba(255, 248, 238, 1); */
+    /* color: black; */
+
+    /* Amazon kindle color theme */
+    background-color: rgba(231, 222, 199, 1);
+    color : rgb(93, 66, 50, 1)
 }
 
 
@@ -617,7 +654,8 @@ Chapter content styling : common text styling and formatting across themes, add 
     color: white;
 }
 .background-white .chapter-toc{
-    color: black;
+    /* color: black; */
+    color: #4d4d4d;
 }
 
 .background-black .chapter-toc:not(:last-child){
