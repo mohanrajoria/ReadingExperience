@@ -1,18 +1,12 @@
 screenOverlayHandler({action : 'show', type : 'page-loading'});
 
 var __BASE_URL__ = "http://gateway.staging.juggernaut.in/",
-    baseUrl = "https://app.juggernaut.in/"
     __USER_ID__ = "",
     __BOOK_ID__ = "",
     __AUTH_TOKEN__ = "Bearer RLYTUIII12ADBF",
     __CLIENT_NAME__ = "",
-    __BOOK_TYPE__ = "community",
-    __USER_INFO__ = {
-                    "user_id":"cd55a5354686480f9fc5e1a391da5384",
-                    "auth_token":"fb079442b18c40849536270805fa23ac",
-                    "role":"admin",
-                    "email_address":"durga@juggernaut.in"
-                };
+    __BOOK_TYPE__ = "commissioned";
+
 
 var _all_images_data_ = {},
     _all_footnotes_data_ = {},
@@ -135,12 +129,14 @@ $(document).ready(function() {
         toggleFootnotePopup('hide');
         getSavedUserPreferences();
 
-        if(__BOOK_TYPE__ === 'community') {
-            $('.chapter-parent-container#community').show();
-            fetchSkeletonData(__BOOK_ID__)
+        if(__VIEW_TYPE__ === 'preview') {
+            $('.chapter-parent-container#commissioned').show();
+            getPreviewChaptersCommissioned(formatPreviewDetailsCommissioned);
+            // bindChapterContainerScrollEnd(scrollEndCallBack);
+            bindChapterContainerOnScroll(scrollingCallBack);
         } else {
             $('.chapter-parent-container#commissioned').show();
-            getChapters(formatReadDetails);
+            getChaptersCommissioned(formatReadDetailsCommissioned);
             bindChapterContainerScrollEnd(scrollEndCallBack);
             bindChapterContainerOnScroll(scrollingCallBack);
         }
@@ -603,19 +599,22 @@ function validateUserForBook(callBack) {
 
     var queryParams = location.search,
         parsedParams = queryParams.split('&'),
-        userId, bookId, clientName,
+        userId, bookId, clientName, viewType,
         validClients = ['railyatri'];
 
-    parsedParams.forEach(function(par, ind) {
-        if(par.indexOf('user_id') != -1) {
-            var arr = par.split('user_id=');
+    parsedParams.forEach(function(param, ind) {
+        if(param.indexOf('user_id') != -1) {
+            var arr = param.split('user_id=');
             userId = arr[arr.length - 1];
-        } else if(par.indexOf('book_id') != -1) {
-            var arr = par.split('book_id=');
+        } else if(param.indexOf('book_id') != -1) {
+            var arr = param.split('book_id=');
             bookId = arr[arr.length - 1];
-        } else if(par.indexOf('guest') != -1) {
-            var arr = par.split('guest=');
+        } else if(param.indexOf('guest') != -1) {
+            var arr = param.split('guest=');
             clientName = arr[arr.length - 1];
+        } else if(param.indexOf('view_type') != -1) {
+            var arr = param.split('view_type=');
+            viewType = arr[arr.length - 1];
         }
     })
 
@@ -631,6 +630,7 @@ function validateUserForBook(callBack) {
             __USER_ID__ = userId;
             __BOOK_ID__ = bookId;
             __CLIENT_NAME__ = clientName;
+            __VIEW_TYPE__ = viewType;
             // todo : setAuthToken over here
             parentReadingContainerToggle('show');
             callBack();
@@ -663,12 +663,14 @@ function ajaxUrlGetter(dataObj) {
 
     if(!isReqArgumentsPresent(dataObj)) return reqUrl;
 
-    if(dataObj.reqType === 'getChapters') {
+    if(dataObj.reqType === 'getChaptersCommissioned') {
         reqUrl = __BASE_URL__ + "yatri/user/" + dataObj.userId + "/book/" + dataObj.bookId + "/read/";
-    } else if(dataObj.reqType === 'getPages') {
+    } else if(dataObj.reqType === 'getPagesCommissioned') {
         reqUrl = __BASE_URL__ + "yatri/user/" + dataObj.userId + "/book/" + dataObj.bookId + "/read/pages/?" + dataObj.pageStr;
-    } else {
-
+    } else if(dataObj.reqType === 'lastReadLocation'){
+        reqUrl = "http://staging.juggernaut.in/" + "yatri/user/" + dataObj.userId + "/book/" + dataObj.bookId + "/last-read-location/";
+    } else if(dataObj.reqType === 'getPreviewChaptersCommissioned'){
+        reqUrl = "http://staging.juggernaut.in/" + "yatri/books/" + dataObj.bookId + "/preview/";
     }
 
     return reqUrl;
@@ -681,8 +683,10 @@ function isReqArgumentsPresent(dataObj) {
     var isValidArgs = true;
 
     var reqParams = {
-        getChapters : ['userId', 'bookId'],
-        getPages : ['userId', 'bookId', 'pageStr']
+        getChaptersCommissioned : ['userId', 'bookId'],
+        getPagesCommissioned : ['userId', 'bookId', 'pageStr'],
+        lastReadLocation : ['userId', 'bookId'],
+        getPreviewChaptersCommissioned : ['bookId']
     }
 
     var reqType = dataObj.reqType;
@@ -696,8 +700,8 @@ function isReqArgumentsPresent(dataObj) {
 }
 
 /** Fetch all the chapters for this book **/
-function getChapters(callback) {
-    var getChapterUrl = ajaxUrlGetter({reqType : 'getChapters', userId : __USER_ID__, bookId : __BOOK_ID__});
+function getChaptersCommissioned(callback) {
+    var getChapterUrl = ajaxUrlGetter({reqType : 'getChaptersCommissioned', userId : __USER_ID__, bookId : __BOOK_ID__});
 
     if(!getChapterUrl) return;
 
@@ -726,7 +730,7 @@ function getChapters(callback) {
 }
 
 /** Format chapter details for current book **/
-function formatReadDetails(data, callback){
+function formatReadDetailsCommissioned(data, callback){
     var bookDetails = data.book_details;
     var lastReadLoc = data.last_read_loc || {};
     if(bookDetails) {
@@ -739,6 +743,59 @@ function formatReadDetails(data, callback){
     } else {
         // todo : error handling
     }
+}
+
+/** Fetch all the chapters for preview of this book **/
+function getPreviewChaptersCommissioned(callback) {
+    var getPreviewChapterUrl = ajaxUrlGetter({reqType : 'getPreviewChaptersCommissioned', bookId : __BOOK_ID__});
+
+    if(!getPreviewChapterUrl) return;
+
+    $.ajax({
+        url : getPreviewChapterUrl,
+        method : "GET",
+        headers : {
+            // Authorization : __AUTH_TOKEN__
+        },
+        success : function(data, status){
+            if(data) {
+                if(callback) {
+                    callback(data, insertChapters);
+                } else {
+                    // todo : think what to do...
+                }
+            } else {
+                // todo : content nhi mila yr :/
+            }
+        },
+        error : function(data, status) {
+            errorHandler({data : data, status : status, errorType : 'API'});
+            // userVerificationFailed(data, status);
+        }
+    });
+}
+
+/** Format chapter details for current book **/
+function formatPreviewDetailsCommissioned(data, callback){
+    var previewData = data.preview || {};
+    var segmentData = {
+        segment_data : previewData.segment_data || [],
+        image_data : previewData.image_data || {},
+        footnotes_data : previewData.footnotes_data || {}
+    }
+    if(previewData.chapter_data) {
+        if(callback) {
+            callback({chapterData : previewData.chapter_data || []}, insertPages, segmentData);
+        } else {
+            // todo : think what to do...
+        }
+    } else {
+        // todo : error handling
+    }
+}
+
+function insertPreviewPagesCommissioned(data, callback) {
+
 }
 
 /** concat pageIds list to query string **/
@@ -768,7 +825,7 @@ function getSegments(pageIds, formatPagesDetailCallBack) {
     var pageIds = pageIds.sort();
     var pagesIdString = arrayToPageIdString(pageIds);
 
-    var getSegmentsUrl = ajaxUrlGetter({userId : __USER_ID__, bookId : __BOOK_ID__, pageStr : pagesIdString, reqType : 'getPages'})
+    var getSegmentsUrl = ajaxUrlGetter({userId : __USER_ID__, bookId : __BOOK_ID__, pageStr : pagesIdString, reqType : 'getPagesCommissioned'})
 
     if(!getSegmentsUrl) return;
 
@@ -850,29 +907,31 @@ function insertPages(data) {
 
 /** process last read location and scroll page to that position and load those pages **/
 function updateLastReadLocation(data) {
-    var pageNumber = data.last_read_page;
-    var pageNumbersToFetch;
-    var selector = _chapter_parent_container_selector_commissioned_, scrollTop;
-    if(pageNumber) {
-        scrollTop = $("div[data-page-number='" + pageNumber + "']").position().top;
-        pageNumbersToFetch = [pageNumber-1, pageNumber, pageNumber+1];
-    } else {
-        pageNumbersToFetch = [1, 2, 3];
+    if(data) {
+        var pageNumber = data.last_read_page;
+        var pageNumbersToFetch;
+        var selector = _chapter_parent_container_selector_commissioned_, scrollTop;
+        if(pageNumber && pageNumber > 1) {
+            scrollTop = $("div[data-page-number='" + pageNumber + "']").position().top;
+            pageNumbersToFetch = [pageNumber-1, pageNumber, pageNumber+1];
+        } else {
+            pageNumbersToFetch = [1, 2, 3];
+        }
+
+        scrollToGivenElement({selector : selector, scrollTop : scrollTop});
+
+        var nonRepeatedPageNumbers = pageNumbersToFetch.map(function(n, i) {
+            if(_fetching_page_numbers_.indexOf(n) === -1) return n;
+        });
+        updateArray(nonRepeatedPageNumbers, _fetching_page_numbers_, 'push');
+        getSegments(nonRepeatedPageNumbers, formatPagesDetail);
     }
 
-    scrollToGivenElement({selector : selector, scrollTop : scrollTop});
-
-    var nonRepeatedPageNumbers = pageNumbersToFetch.map(function(n, i) {
-        if(_fetching_page_numbers_.indexOf(n) === -1) return n;
-    });
-
-    updateArray(nonRepeatedPageNumbers, _fetching_page_numbers_, 'push');
-    getSegments(nonRepeatedPageNumbers, formatPagesDetail);
     showPageNumber();
 }
 
 /** Insert chapter containers **/
-function insertChapters(data, callBack) {
+function insertChapters(data, callBack, callBackArgs) {
     var chapterData = data.chapterData;
     buildTOC(chapterData);
     if(chapterData.length > 0) {
@@ -882,7 +941,7 @@ function insertChapters(data, callBack) {
         updateLastReadLocation(data.lastReadLoc);
 
         if(callBack) {
-            callBack();
+            callBack(callBackArgs);
         }
     }
 }
@@ -1123,17 +1182,6 @@ function screenOverlayHandler(dataObj) {
     }
 }
 
-/** Ajax call handler **/
-function apiService(dataObj) {
-    var reqMethod = dataObj.reqMethod;
-
-}
-
-/** URL mapper for apis **/
-function apiURLMapper() {
-    // todo : further optimizations
-}
-
 /** Ajax error handler **/
 function errorHandler(dataObj) {
     if(dataObj.errorType === 'API') {
@@ -1255,332 +1303,4 @@ function updateFootnotePopupContent(dataObj) {
 function disableCopyPaste(dataObj) {
     // dataObj = {selector : '.somePageName'}
     // todo : disable on given page selector inside dataObj
-}
-
-/*
- xyzSegment = {
- "position": n,
- "element": DOMELEMENT
- }
- */
-//for the time being
-// This needs to be changed to the last read position
-var lastSegment = null;
-var currentSegment = {
-	"position": 0,
-	"element": $(".individualSection")[0]
-};
-
-$(document).ready(function() {
-	//scrollPositionHandler = new ScrollPosition(document.querySelector('.main_container_h'));
-});
-
-$(document).on("click", ".new_read_TOC_h > li", function(e){
-	//console.log($(this).attr("data-chapter-id"));
-	scrollIntoView($(this).attr("data-chapter-id"));
-})
-
-function initiateInView(){
-	// Binding the in-view of elements created
-	// all the end leafs are bound here
-
-	inView('.individualSection').on('enter', function(ele){
-		lastSegment = currentSegment;
-		currentSegment = {
-			"position": $.inArray(ele, $(".individualSection")),
-			"element": ele
-		}
-		if(currentSegment.position < lastSegment.position){
-			scrollDirection = "up";
-		}else{
-			scrollDirection = "down";
-		}
-		// call the function to fetch data for the section
-		// getDataForSegment($(ele).attr("id"));
-		getDataForSegmentMultiple($(ele).attr("id"), bookId);
-		updatePageNumber($(ele).attr("data-pageNo"));
-	});
-}
-
-function initiateImageLoader(data){
-	// return
-	// console.log(data);
-	if(data.length == 0){
-		return;
-	}
-
-	var imgArray = [];
-	$.each(data, function(i){
-		imgArray.push({
-			"document_id":data[i].value
-		});
-	});
-	if(imgArray.length > 0){
-		$.ajax({
-			url: baseUrl + 'docs/',
-			dataType: 'json',
-			type: 'POST',
-			contentType: "application/json; charset=utf-8",
-			data: JSON.stringify({"document_list" : imgArray}),
-			success: function( data){
-				// console.log(data);
-				populateImages(data);
-
-			},
-			error: function( jqXhr, textStatus, errorThrown ){
-				//console.log( errorThrown );
-			}
-		});
-	}
-}
-
-function populateImages(data){
-	// console.log(data);
-	if(data && data.data && (data.data.length > 0)){
-		var ele;
-		for(var i=0; i<data.data.length; i++){
-			ele = $("img[data-image-id='"+data.data[i].id+"']");
-			$(ele).attr('src', data.data[i].url);
-			$(ele).css( 'content', 'url('+data.data[i].url+')' );
-		}
-	}
-
-}
-
-function fetchSkeletonData(book_id){
-	scrollPositionHandler = new ScrollPosition(document.querySelector(_chapter_parent_container_selector_community_));
-	bookId = book_id;
-
-	sectionsCalled = {};
-	scrollDirection;
-	test = false;
-	scrollPositionHandler;
-	allSegmentsID.length = 0;
-	lastSegment = null;
-	currentSegment = {
-		"position": 0,
-		"element": $(".individualSection")[0]
-	};
-
-	var data = $.param({ field: ['skeleton', 'book_detail'] }, true);
-
-	// var data = $.param({ field: ['skeleton', 'book_detail'] }, true);
-	$.ajax({
-		url: baseUrl + "books/"+bookId+'/read-meta/',
-		headers: {
-			'Authorization': 'Basic ' + __USER_INFO__.auth_token,
-			'source': 'web'
-		},
-		contentType: 'application/json; charset=utf-8'
-	}).done(function(data) {
-		createSkeleton("community.chapter-parent-container", data.skeleton.skeleton_json);
-		initiateInView();
-		// TO DO
-		// this has to be changed to the last read ID - NOTE
-		if(data.last_read_loc.last_read_section){
-			getDataForSegmentMultiple(data.last_read_loc.last_read_section, bookId);
-		}else{
-			getDataForSegmentMultiple(allSegmentsID[0], bookId);
-		}
-
-        screenOverlayHandler({action : 'hide', type : 'page-loading'});
-	});
-}
-
-// function fetchSkeletonDataPreview(book_id){
-// 	bookId = book_id;
-// 	$.ajax({
-// 		url: baseUrl +"books/"+bookId+'/preview-meta/',
-// 		headers: {
-// 			'Authorization': 'Basic ' + __USER_INFO__.auth_token,
-// 			'source': 'web'
-// 		},
-// 		contentType: 'application/json; charset=utf-8'
-// 		// data: data
-// 	}).done(function(data) {
-// 		console.log(data);
-// 		createSkeleton("mainContainer", data.preview_skeleton.skeleton_json);
-// 		initiateInView();
-// 		// TO DO
-// 		// this has to be changed to the last read ID - NOTE
-// 		getDataForSegmentMultiple(allSegmentsID[0], bookId);
-// 		// scrollIntoView(allSegmentsID[0]);
-// 	});
-// }
-
-// function to scroll any div into the viewport
-// parameter: ID of the div
-function scrollIntoView(id){
-	document.getElementById(id).scrollIntoView();
-}
-function updatePageNumber(page){
-	$("#current-first-visible-page-number").html(page);
-}
-
-function getDataForSegmentMultiple(id, book_id){
-	bookId = book_id;
-	var sectionIDS = [];
-	var currentIDIndex = allSegmentsID.indexOf(id);
-	var startID = (currentIDIndex<=5)?0:currentIDIndex;
-	var segmentIDsForCall = allSegmentsID.slice(startID, startID+15);
-	for(var i=0; i<segmentIDsForCall.length; i++){
-		if((!sectionsCalled.hasOwnProperty(segmentIDsForCall[i])) && (sectionsCalled[segmentIDsForCall[i]] === undefined)){
-			sectionIDS.push(segmentIDsForCall[i]);
-		}
-	}
-	if(sectionIDS.length > 0){
-		if(scrollDirection === "up"){
-			scrollPositionHandler.prepareFor("up");
-		}
-		// do the ajax for the section with the ID here
-		// on success add the element id to the object
-
-		for(var j=0; j<sectionIDS.length; j++){
-			sectionsCalled[sectionIDS[j]] = true;
-		}
-
-		var data = $.param({ section_id: sectionIDS }, true);
-		$.ajax({
-			url: baseUrl +'books/'+bookId+'/sections/',
-			contentType: '"application/json; charset=utf-8"',
-			headers: {
-				'Authorization': 'Basic ' + __USER_INFO__.auth_token,
-				'source': 'web'
-			},
-			data: data
-		}).done(function(response) {
-			populateDataMultiple(response);
-			initiateImageLoader(response.assets);
-		});
-	}
-}
-
-function populateDataMultiple(response){
-
-	for(var i=0; i<response.sections.length; i++){
-		if(scrollDirection === "up"){
-			scrollPositionHandler.prepareFor("up");
-		}
-		// try{
-		//     $("#"+response.sections[i].section_id).html(response.sections[i].html).addClass("loaded");
-		// }catch(er){
-		var ele = document.getElementById(response.sections[i].section_id);
-		// $(ele).html(response.sections[i].html).addClass("loaded");
-		if(ele){
-			ele.innerHTML = response.sections[i].html;
-		}
-
-		// }
-
-		if(scrollDirection === "up"){
-			scrollPositionHandler.restore();
-		}
-		// debugger
-		if($("#"+response.sections[i].section_id).hasClass('stretchImage')){
-			//console.log("has image")
-			//console.log($("#"+response.sections[i].section_id).find('stretchImage').attr('img-id'));
-		}
-	}
-}
-
-/*
- Function ScrollPosition to maintain the position of the scroll when a content is loaded on the top
- ==================================================================================================
- */
-function ScrollPosition(node) {
-	this.node = node;
-	this.previousScrollHeightMinusTop = 0;
-	this.readyFor = 'up';
-}
-
-ScrollPosition.prototype.restore = function () {
-	if (this.readyFor === 'up') {
-		// this.node.scrollTop = this.node.scrollHeight - this.previousScrollHeightMinusTop;
-		window.scrollBy(0, (this.node.scrollHeight - this.previousScrollHeightMinusTop));
-	}
-
-	// 'down' doesn't need to be special cased unless the
-	// content was flowing upwards, which would only happen
-	// if the container is position: absolute, bottom: 0 for
-	// a Facebook messages effect
-}
-
-ScrollPosition.prototype.prepareFor = function (direction) {
-	this.readyFor = direction || 'up';
-	this.previousScrollHeightMinusTop = this.node.scrollHeight - this.node.scrollTop;
-}
-
-/*
- Function to create the HTML structure with the JSON
- ===================================================
- */
-function createSkeleton(containerID, data){
-	// container element
-	var tocCount = 1;
-	var container = $("#"+containerID);
-	var currentChild, currentChildID, sectionDiv, placeholderDiv;
-	for(var i=0; i<data.order.length; i++){
-
-		currentChild = data.children[data.order[i]];
-
-		currentChildID = data.children[data.order[i]].section_id;
-
-		// create the first order of div
-		sectionDiv = $("<div>").attr({
-			id: currentChildID
-		}).appendTo(container);
-
-
-
-
-		if((!$.isEmptyObject(currentChild.children))&&(currentChild.order.length > 0)){
-			$(sectionDiv).addClass("sectionBunch");
-			createSkeleton(currentChildID, currentChild);
-
-		}else{
-			placeholderDiv = $("<div>").attr({
-				class: 'individualPlaceholder'
-				// id: currentChildID + i
-			});
-			$(sectionDiv).addClass("individualSection");
-			// debugger
-			$(sectionDiv).attr('data-pageNo', data.children[data.order[i]].meta.page_num);
-			placeholderDiv.appendTo(sectionDiv);
-			allSegmentsID.push(currentChildID);
-
-            /**
-
-			if(currentChild.meta.tocHeading){
-				$(".new_read_TOC_h").append("<li "+"data-chapter-id="+currentChildID+">"+tocCount + ". " +currentChild.meta.tocHeading+"</li>");
-				tocCount++;
-				// console.log("heading = "+ currentChild.meta.tocHeading);
-				// console.log("section ID = "+currentChildID);
-			}
-            */
-		}
-	}
-}
-
-function checkAndCreateTOC(){
-
-}
-// TODO : change to binary search
-
-function findFirstSectionInView(){
-	// var diff;
-	var topSection;
-	// debugger
-	//console.log(allSegmentsID);
-	var windowTop = Math.max($('body').scrollTop(), $('html').scrollTop());
-	for(var i=0; i<allSegmentsID.length; i++){
-		if($('#'+allSegmentsID[i]).hasClass("loaded")){
-			if($('#'+allSegmentsID[i]).position().top >= windowTop){
-				topSection = allSegmentsID[i];
-				// topSection = $('#'+allSegmentsID[i]);
-				break;
-			}
-		}
-	}
-	return topSection;
-	// console.log(topSection);
 }
