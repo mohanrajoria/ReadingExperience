@@ -488,7 +488,7 @@ function getAllPagesInViewPort(args) {
 
     for(var i = args.firstVisiblePageNumber; i <= _max_page_number_; i++) {
         var ele = $('div[data-page-number="'+i+'"]'),
-            offsetTop = ele.offset().top
+            offsetTop = ele ? ele.offset().top : 0,
             isLoaded = (args.shouldCheckIsPageLoaded) ? ele.hasClass('is-loaded') : false;
         if(offsetTop > windowHeight) {
             if(!isLoaded) visiblePageNumbers.push(i);
