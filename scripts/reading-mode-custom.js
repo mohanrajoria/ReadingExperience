@@ -1331,12 +1331,6 @@ function updateFootnotePopupContent(dataObj) {
     $("#tooltip-container").attr({'data-footnote-id' : id});
 }
 
-/** Disable copy paste on a particular page */
-function disableCopyPaste(dataObj) {
-    // dataObj = {selector : '.somePageName'}
-    // todo : disable on given page selector inside dataObj
-}
-
 /** Check if scroll position changed after 10 sec and update if required **/
 function checkScrollPositionChangesAndUpdate(callBack) {
     /**

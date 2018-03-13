@@ -16,6 +16,14 @@
 .chapter-parent-container .chapter-container .chapter-segment-container {
 
 }
+.chapter-container{
+    -webkit-user-select: none;  
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+
 
 /** custom scroll bar */
 .tooltip-container::-webkit-scrollbar-track,
