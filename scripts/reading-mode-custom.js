@@ -31,6 +31,8 @@ var _all_images_data_ = {},
     test = false,
     scrollPositionHandler,
     allSegmentsID = [],
+    _scrollPositionUpdateCronTimeout_ = 500,
+    _saveLastReadLocationTimeout_ = 1000,
     _styling_classes_obj_ = {
         'backgroundColorStyle' : {
             classes : [
@@ -132,13 +134,16 @@ $(document).ready(function() {
         if(__VIEW_TYPE__ === 'preview') {
             $('.chapter-parent-container#commissioned').show();
             getPreviewChaptersCommissioned(formatPreviewDetailsCommissioned);
-            // bindChapterContainerScrollEnd(scrollEndCallBack);
-            bindChapterContainerOnScroll(scrollingCallBack);
+            bindChapterContainerScrollEnd(scrollEndCallBack);
+            // bindChapterContainerOnScroll(scrollingCallBack);
+            checkScrollPositionChangesAndUpdate(scrollingCallBack);
         } else {
             $('.chapter-parent-container#commissioned').show();
             getChaptersCommissioned(formatReadDetailsCommissioned);
             bindChapterContainerScrollEnd(scrollEndCallBack);
-            bindChapterContainerOnScroll(scrollingCallBack);
+            // bindChapterContainerOnScroll(scrollingCallBack);
+            checkScrollPositionChangesAndUpdate(scrollingCallBack);
+            // checkPageNumberUpdateAndSaveLastReadLocation();
         }
     })
 
@@ -362,8 +367,11 @@ function saveCurrentScrollAndFirstElement(dataObj, visibleContentInViewPort) {
     dataObj.visibleFirstElement['pageNumber'] = visibleFirstElementDetail['pageNumber'];
     dataObj.visibleFirstElement['cId'] = visibleFirstElementDetail['cId'];
     dataObj.visibleFirstElement['topOffset'] = visibleFirstElementDetail['topOffset'];
+    dataObj.visibleFirstElement['segmentId'] = visibleFirstElementDetail['segmentId'];
 
     dataObj.scrollPosition = windowScroll;
+
+    return dataObj;
 }
 
 /** Maintain visible content position as user changes font size, line height etc. **/
@@ -439,23 +447,23 @@ function bindChapterContainerScrollEnd(callBack) {
 /** When scroll stops do required things such as getting pages, updating content etc... **/
 function scrollEndCallBack() {
     // var viewportVisibleContentInfo = viewportVisibleContentInfo ? viewportVisibleContentInfo : {pageNumberList : []};
-    var viewportVisibleContentInfo = getSegmentsInViewPort();
+    var viewportVisibleContentInfo = getSegmentsInViewPort({shouldCheckIsPageLoaded : true});
     var pageNumberList = viewportVisibleContentInfo ? viewportVisibleContentInfo.pageNumberList : [];
 
     var nonRepeatedPageNumbers = pageNumberList.filter(function(n, i) {
         return (_fetching_page_numbers_.indexOf(n) === -1);
     });
 
-    if(nonRepeatedPageNumbers.length === 0) return;
+    if(nonRepeatedPageNumbers.length != 0) {
+        updateArray(nonRepeatedPageNumbers, _fetching_page_numbers_, 'push');
+        getSegments(nonRepeatedPageNumbers, formatPagesDetail);
 
-    updateArray(nonRepeatedPageNumbers, _fetching_page_numbers_, 'push');
-    getSegments(nonRepeatedPageNumbers, formatPagesDetail);
-
-    saveCurrentScrollAndFirstElement(_visible_viewport_element_obj_, viewportVisibleContentInfo);
+        saveCurrentScrollAndFirstElement(_visible_viewport_element_obj_, viewportVisibleContentInfo);
+    }
 }
 
 /** Get all visible pages in view port wrapper (removing duplicates etc.) **/
-function getSegmentsInViewPort() {
+function getSegmentsInViewPort(args) {
     var chapterParentContainerScrollPos = $(_chapter_parent_container_selector_commissioned_).scrollTop(),
         firstElement = 1,
         lastElement = _max_page_number_,
@@ -467,20 +475,20 @@ function getSegmentsInViewPort() {
 
     if(!firstVisiblePageNumber) return;
 
-    visiblePageNumbers = getAllPagesInViewPort(firstVisiblePageNumber);
+    visiblePageNumbers = getAllPagesInViewPort(Object.assign({}, {firstVisiblePageNumber : firstVisiblePageNumber}, args));
 
     return {pageNumberList : visiblePageNumbers, firstVisiblePage : firstVisiblePageNumber};
 }
 
 /** Getting all pages in view port, while first visible page is given **/
-function getAllPagesInViewPort(firstPageNumber) {
+function getAllPagesInViewPort(args) {
     var visiblePageNumbers = [],
         windowHeight = window.innerHeight;
 
-    for(var i = firstPageNumber; i <= _max_page_number_; i++) {
+    for(var i = args.firstPageNumber; i <= _max_page_number_; i++) {
         var ele = $('div[data-page-number="'+i+'"]'),
             offsetTop = ele.offset().top
-            isLoaded = ele.hasClass('is-loaded');
+            isLoaded = (args.shouldCheckIsPageLoaded) ? ele.hasClass('is-loaded') : false;
         if(offsetTop > windowHeight) {
             if(!isLoaded) visiblePageNumbers.push(i);
             break;
@@ -497,6 +505,23 @@ function showPageNumber(e) {
     var firstVisiblePageNumber = getFirstVisibleElementWhileScrolling();
     if(firstVisiblePageNumber) {
         $('#current-first-visible-page-number')[0].innerHTML = firstVisiblePageNumber;
+/**
+        var currentShownPageNumber = $('#current-first-visible-page-number')[0].innerHTML;
+            currentShownPageNumber = Number.isNaN(currentShownPageNumber * 1) ? 1 : currentShownPageNumber * 1;
+
+        if(firstVisiblePageNumber > currentShownPageNumber) {
+            for(; currentShownPageNumber <= firstVisiblePageNumber; currentShownPageNumber++) {
+                $('#current-first-visible-page-number')[0].innerHTML = currentShownPageNumber;
+            }
+        } else if(firstVisiblePageNumber < currentShownPageNumber) {
+            for(; currentShownPageNumber >= firstVisiblePageNumber; currentShownPageNumber--) {
+                $('#current-first-visible-page-number')[0].innerHTML = currentShownPageNumber;
+            }
+        } else {
+            // do nothing... :p
+        }
+
+*/
     }
 }
 
@@ -551,7 +576,7 @@ function firstPageInViewPort(low, high, windowScrollPos) {
 function topMostContentIdInViewport(dataObj) {
     var chapterParentContainerScrollPos = $(_chapter_parent_container_selector_commissioned_).scrollTop(),
         windowHeight = window.innerHeight,
-        viewportVisibleContentInfo = dataObj.viewportVisibleContentInfo || getSegmentsInViewPort(),
+        viewportVisibleContentInfo = dataObj.viewportVisibleContentInfo || getSegmentsInViewPort({shouldCheckIsPageLoaded : false}),
         pageNumberList = viewportVisibleContentInfo ? viewportVisibleContentInfo.pageNumberList : [],
         firstVisiblePageNumber = '',
         firstVisibleCId = '';
@@ -583,7 +608,8 @@ function topMostContentIdInViewport(dataObj) {
     return {
         pageNumber : firstVisiblePageNumber,
         cId : firstVisibleCId,
-        topOffset : topOffset
+        topOffset : topOffset,
+        segmentId : $("[data-page-number='" + firstVisiblePageNumber + "']")[0].getAttribute('id')
     }
 }
 
@@ -667,7 +693,7 @@ function ajaxUrlGetter(dataObj) {
         reqUrl = __BASE_URL__ + "yatri/user/" + dataObj.userId + "/book/" + dataObj.bookId + "/read/";
     } else if(dataObj.reqType === 'getPagesCommissioned') {
         reqUrl = __BASE_URL__ + "yatri/user/" + dataObj.userId + "/book/" + dataObj.bookId + "/read/pages/?" + dataObj.pageStr;
-    } else if(dataObj.reqType === 'lastReadLocation'){
+    } else if(dataObj.reqType === 'saveLastReadLocation'){
         reqUrl = "http://staging.juggernaut.in/" + "yatri/user/" + dataObj.userId + "/book/" + dataObj.bookId + "/last-read-location/";
     } else if(dataObj.reqType === 'getPreviewChaptersCommissioned'){
         reqUrl = "http://staging.juggernaut.in/" + "yatri/books/" + dataObj.bookId + "/preview/";
@@ -685,7 +711,7 @@ function isReqArgumentsPresent(dataObj) {
     var reqParams = {
         getChaptersCommissioned : ['userId', 'bookId'],
         getPagesCommissioned : ['userId', 'bookId', 'pageStr'],
-        lastReadLocation : ['userId', 'bookId'],
+        saveLastReadLocation : ['userId', 'bookId'],
         getPreviewChaptersCommissioned : ['bookId']
     }
 
@@ -927,7 +953,9 @@ function updateLastReadLocation(data) {
         getSegments(nonRepeatedPageNumbers, formatPagesDetail);
     }
 
-    showPageNumber();
+    checkPageNumberUpdateAndSaveLastReadLocation();
+
+    // showPageNumber();
 }
 
 /** Insert chapter containers **/
@@ -1303,4 +1331,72 @@ function updateFootnotePopupContent(dataObj) {
 function disableCopyPaste(dataObj) {
     // dataObj = {selector : '.somePageName'}
     // todo : disable on given page selector inside dataObj
+}
+
+/** Check if scroll position changed after 10 sec and update if required **/
+function checkScrollPositionChangesAndUpdate(callBack) {
+    /**
+    1. update page number in view
+    2. update last read location
+    **/
+    setTimeout(function() {
+        callBack();
+        checkScrollPositionChangesAndUpdate(callBack);
+    }, _scrollPositionUpdateCronTimeout_)
+}
+
+/** Wrapper over save last read location **/
+
+function checkPageNumberUpdateAndSaveLastReadLocation() {
+    setTimeout(function() {
+        saveLastReadLocation();
+        checkPageNumberUpdateAndSaveLastReadLocation();
+    }, _saveLastReadLocationTimeout_)
+}
+
+/** Save last read location **/
+function saveLastReadLocation() {
+    var viewportVisibleContentInfo = getSegmentsInViewPort({shouldCheckIsPageLoaded : false});
+    var newLocationInfo = saveCurrentScrollAndFirstElement(_visible_viewport_element_obj_, viewportVisibleContentInfo);
+
+    // var firstVisiblePageNumber = getFirstVisibleElementWhileScrolling();
+    if(currentLocationInfo) {
+        var saveLastReadLocURL = ajaxUrlGetter({reqType : 'saveLastReadLocation', userId : __USER_ID__, bookId : __BOOK_ID__});
+
+        if(!saveLastReadLocURL) return;
+
+        var lastReadLocDataObj = {
+            last_read_book : __BOOK_ID__,
+            last_read_segment : currentLocationInfo.segmentId,
+            last_read_word : currentLocationInfo.cId,
+            last_read_page : currentLocationInfo.pageNumber
+        }
+
+        var currentShownPageNumber = $('#current-first-visible-page-number')[0].innerHTML;
+
+        if(newLocationInfo.pageNumber != currentShownPageNumber * 1) {
+            $.ajax({
+                url : getSegmentsUrl,
+                method : "PUT",
+                data : lastReadLocDataObj,
+                dataType : 'application/json',
+                headers : {
+                    Authorization : __AUTH_TOKEN__
+                },
+                success : function(data, status){
+                    if(data) {
+                        if(formatPagesDetailCallBack) {
+                            formatPagesDetailCallBack(data, insertPages);
+                        } else {
+                            // todo : ab tera kya hoga kaliya...
+                        }
+                    }
+                },
+                error : function(data, status) {
+                    updateArray(pageIds, _fetching_page_numbers_, 'pop');
+                    errorHandler({data : data, status : status, errorType : 'API'});
+                }
+            });
+        }
+    }
 }
