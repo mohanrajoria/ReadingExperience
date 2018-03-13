@@ -32,7 +32,7 @@ var _all_images_data_ = {},
     test = false,
     scrollPositionHandler,
     allSegmentsID = [],
-    _scrollPositionUpdateCronTimeout_ = 500,
+    _scrollPositionUpdateCronTimeout_ = 1000,
     _saveLastReadLocationTimeout_ = 7000,
     _styling_classes_obj_ = {
         'backgroundColorStyle' : {
@@ -558,7 +558,7 @@ function firstPageInViewPort(low, high, windowScrollPos) {
                 return mid;
             }
         }
-        return firstPageInViewPort(mid, high, windowScrollPos);
+        return firstPageInViewPort(mid + 1, high, windowScrollPos);
     } else if(offsetTop > 0) {
         var prevPageNumber = mid - 1;
         if(prevPageNumber > 0) {
@@ -1362,8 +1362,8 @@ function saveLastReadLocation() {
 
         var modifiedDataToSave = {
             last_read_segment : newLocationInfo.segmentId,
-            last_read_page : newLocationInfo.pageNumber || viewportVisibleContentInfo.firstVisiblePage,
-            last_read_word : newLocationInfo.cId,
+            last_read_page : newLocationInfo.pageNumber || viewportVisibleContentInfo.firstVisiblePage || null,
+            last_read_word : newLocationInfo.cId ? newLocationInfo.cId * 1 : null,
             last_read_book : __BOOK_ID__
         }
 
