@@ -144,7 +144,7 @@ $(document).ready(function() {
             bindChapterContainerScrollEnd(scrollEndCallBack);
             // bindChapterContainerOnScroll(scrollingCallBack);
             checkScrollPositionChangesAndUpdate(scrollingCallBack);
-            // checkPageNumberUpdateAndSaveLastReadLocation();
+            checkPageNumberUpdateAndSaveLastReadLocation();
         }
     })
 
@@ -956,10 +956,6 @@ function updateLastReadLocation(data) {
         updateArray(nonRepeatedPageNumbers, _fetching_page_numbers_, 'push');
         getSegments(nonRepeatedPageNumbers, formatPagesDetail);
     }
-
-    checkPageNumberUpdateAndSaveLastReadLocation();
-
-    // showPageNumber();
 }
 
 /** Insert chapter containers **/
