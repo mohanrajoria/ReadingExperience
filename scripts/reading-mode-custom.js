@@ -15,6 +15,7 @@ var _all_images_data_ = {},
     _fetching_segment_ids_ = [],
     _fetching_page_numbers_ = [],
     _max_page_number_ = 1,
+    _last_saved_location_info_obj_ = {},
     _footnote_popup_selector_ = '#tooltip-container',
     _chapter_parent_container_selector_commissioned_ = '#commissioned.chapter-parent-container',
     _chapter_parent_container_selector_community_ = '#community.chapter-parent-container',
@@ -32,7 +33,7 @@ var _all_images_data_ = {},
     scrollPositionHandler,
     allSegmentsID = [],
     _scrollPositionUpdateCronTimeout_ = 500,
-    _saveLastReadLocationTimeout_ = 1000,
+    _saveLastReadLocationTimeout_ = 7000,
     _styling_classes_obj_ = {
         'backgroundColorStyle' : {
             classes : [
@@ -371,7 +372,7 @@ function saveCurrentScrollAndFirstElement(dataObj, visibleContentInViewPort) {
 
     dataObj.scrollPosition = windowScroll;
 
-    return dataObj;
+    return visibleFirstElementDetail;
 }
 
 /** Maintain visible content position as user changes font size, line height etc. **/
@@ -485,7 +486,7 @@ function getAllPagesInViewPort(args) {
     var visiblePageNumbers = [],
         windowHeight = window.innerHeight;
 
-    for(var i = args.firstPageNumber; i <= _max_page_number_; i++) {
+    for(var i = args.firstVisiblePageNumber; i <= _max_page_number_; i++) {
         var ele = $('div[data-page-number="'+i+'"]'),
             offsetTop = ele.offset().top
             isLoaded = (args.shouldCheckIsPageLoaded) ? ele.hasClass('is-loaded') : false;
@@ -609,7 +610,7 @@ function topMostContentIdInViewport(dataObj) {
         pageNumber : firstVisiblePageNumber,
         cId : firstVisibleCId,
         topOffset : topOffset,
-        segmentId : $("[data-page-number='" + firstVisiblePageNumber + "']")[0].getAttribute('id')
+        segmentId : firstVisiblePageNumber ? $("[data-page-number='" + firstVisiblePageNumber + "']")[0].getAttribute('id') : ""
     }
 }
 
@@ -934,11 +935,14 @@ function insertPages(data) {
 /** process last read location and scroll page to that position and load those pages **/
 function updateLastReadLocation(data) {
     if(data) {
-        var pageNumber = data.last_read_page;
-        var pageNumbersToFetch;
+        var pageNumber = data.last_read_page,
+            segmentId = data.last_read_segment,
+            cId = data.last_read_word || 0,
+            pageNumbersToFetch;
         var selector = _chapter_parent_container_selector_commissioned_, scrollTop;
         if(pageNumber && pageNumber > 1) {
-            scrollTop = $("div[data-page-number='" + pageNumber + "']").position().top;
+            var pageElement = $("div[data-page-number='" + pageNumber + "']")[0];
+            scrollTop = $(pageElement).position().top;
             pageNumbersToFetch = [pageNumber-1, pageNumber, pageNumber+1];
         } else {
             pageNumbersToFetch = [1, 2, 3];
@@ -1357,44 +1361,37 @@ function checkPageNumberUpdateAndSaveLastReadLocation() {
 /** Save last read location **/
 function saveLastReadLocation() {
     var viewportVisibleContentInfo = getSegmentsInViewPort({shouldCheckIsPageLoaded : false});
-    var newLocationInfo = saveCurrentScrollAndFirstElement(_visible_viewport_element_obj_, viewportVisibleContentInfo);
+    var newLocationInfo = topMostContentIdInViewport({viewportVisibleContentInfo : viewportVisibleContentInfo});
 
-    // var firstVisiblePageNumber = getFirstVisibleElementWhileScrolling();
-    if(currentLocationInfo) {
+    if(newLocationInfo) {
         var saveLastReadLocURL = ajaxUrlGetter({reqType : 'saveLastReadLocation', userId : __USER_ID__, bookId : __BOOK_ID__});
 
         if(!saveLastReadLocURL) return;
 
-        var lastReadLocDataObj = {
-            last_read_book : __BOOK_ID__,
-            last_read_segment : currentLocationInfo.segmentId,
-            last_read_word : currentLocationInfo.cId,
-            last_read_page : currentLocationInfo.pageNumber
-        }
-
         var currentShownPageNumber = $('#current-first-visible-page-number')[0].innerHTML;
 
-        if(newLocationInfo.pageNumber != currentShownPageNumber * 1) {
+        var modifiedDataToSave = {
+            last_read_segment : newLocationInfo.segmentId,
+            last_read_page : newLocationInfo.pageNumber || viewportVisibleContentInfo.firstVisiblePage,
+            last_read_word : newLocationInfo.cId,
+            last_read_book : __BOOK_ID__
+        }
+
+        if(modifiedDataToSave.last_read_page != _last_saved_location_info_obj_.last_read_page && modifiedDataToSave.last_read_word != _last_saved_location_info_obj_.last_read_word) {
             $.ajax({
-                url : getSegmentsUrl,
+                url : saveLastReadLocURL,
                 method : "PUT",
-                data : lastReadLocDataObj,
-                dataType : 'application/json',
+                data : JSON.stringify(Object.assign({}, modifiedDataToSave)),
+                contentType : 'application/json',
                 headers : {
                     Authorization : __AUTH_TOKEN__
                 },
                 success : function(data, status){
-                    if(data) {
-                        if(formatPagesDetailCallBack) {
-                            formatPagesDetailCallBack(data, insertPages);
-                        } else {
-                            // todo : ab tera kya hoga kaliya...
-                        }
-                    }
+                    _last_saved_location_info_obj_ = Object.assign({}, modifiedDataToSave);
                 },
                 error : function(data, status) {
-                    updateArray(pageIds, _fetching_page_numbers_, 'pop');
-                    errorHandler({data : data, status : status, errorType : 'API'});
+                    // updateArray(pageIds, _fetching_page_numbers_, 'pop');
+                    // errorHandler({data : data, status : status, errorType : 'API'});
                 }
             });
         }
