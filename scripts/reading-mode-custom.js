@@ -388,7 +388,7 @@ function maintainVisibleViewportContentsPosition(dataObj) {
 
     var firstVisibleElementSelector = _chapter_parent_container_selector_commissioned_ + " div[data-page-number='" + pageNumber + "'] #" + cId,
         firstElementOffsetPrevious = visibleFirstElementDetail.topOffset,
-        firstElementOffsetCurrent = $(firstVisibleElementSelector).offset().top,
+        firstElementOffsetCurrent = $(firstVisibleElementSelector) ? $(firstVisibleElementSelector).offset().top : "",
         windowScrollPositionToUpdate;
 
     if(firstElementOffsetPrevious > firstElementOffsetCurrent) {

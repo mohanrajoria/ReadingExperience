@@ -17,7 +17,7 @@
 
 }
 .chapter-container{
-    -webkit-user-select: none;  
+    -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
@@ -204,6 +204,7 @@ Chapter content styling : common text styling and formatting across themes, add 
 .black-BG-theme.chapter-parent-container{
     /* background-color: rgba(0, 0, 0, 1); */
     background-color: rgba(31, 31, 31, 1);
+    background-color: rgba(47, 47, 47, 1);
 }
 .grey-BG-theme.chapter-parent-container{
     background-color: rgba(245, 245, 245, 1);
@@ -230,7 +231,9 @@ Chapter content styling : common text styling and formatting across themes, add 
 .black-BG-theme.chapter-parent-container ul li,
 .black-BG-theme.chapter-parent-container ol li{
     /* color: white; */
-    color : #d6d6d6;
+    /* color : #d6d6d6; */
+    color: #a7a5a5;
+
 }
 
 .biege-BG-theme.chapter-parent-container p,
@@ -358,7 +361,10 @@ Chapter content styling : common text styling and formatting across themes, add 
     /* background-color: black; */
     /* color: white; */
 
-    background-color: rgba(31, 31, 31, 1);
+    /* background-color: rgba(31, 31, 31, 1); */
+
+    background-color: rgba(47, 47, 47, 1);
+    color : #a7a5a5;
 
 }
 #tooltip-container{
@@ -388,7 +394,8 @@ Chapter content styling : common text styling and formatting across themes, add 
 }
 #option-trigger-btn.background-black{
     /* background-color: black; */
-    background-color: rgba(31, 31, 31, 1);
+    /* background-color: rgba(31, 31, 31, 1); */
+    background-color: rgba(47, 47, 47, 1);
     border: 1px solid white;
     border-right: none;
 }
@@ -417,7 +424,8 @@ Chapter content styling : common text styling and formatting across themes, add 
 }
 .style-btn-container.background-black{
     /* background-color: black; */
-    background-color: rgba(31, 31, 31, 1);
+    /* background-color: rgba(31, 31, 31, 1); */
+    background-color: rgba(47, 47, 47, 1);
 }
 
 .option-expanded{
@@ -449,7 +457,8 @@ Chapter content styling : common text styling and formatting across themes, add 
 }
 .background-black .option-expanded{
     /* background-color: black; */
-    background-color: rgba(31, 31, 31, 1);
+    /* background-color: rgba(31, 31, 31, 1); */
+    background-color: rgba(47, 47, 47, 1);
 }
 
 .option-container{
@@ -463,7 +472,8 @@ Chapter content styling : common text styling and formatting across themes, add 
 }
 .background-black .option-container {
     /* background-color: black; */
-    background-color: rgba(31, 31, 31, 1);
+    /* background-color: rgba(31, 31, 31, 1); */
+    background-color: rgba(47, 47, 47, 1);
 }
 /*
 .option-types{
@@ -606,8 +616,11 @@ Chapter content styling : common text styling and formatting across themes, add 
     /* background-color: rgba(0, 0, 0, 1); */
     /* color: white;  */
 
-    background-color: rgba(31, 31, 31, 1);
-    color : #d6d6d6;
+    /* background-color: rgba(31, 31, 31, 1); */
+    /* color : #d6d6d6; */
+
+    background-color: rgba(47, 47, 47, 1);
+    color : #a7a5a5;
 }
 .background-color-update.grey{
     background-color: rgba(245, 245, 245, 1);
@@ -659,11 +672,16 @@ Chapter content styling : common text styling and formatting across themes, add 
 }
 
 .background-black .chapter-toc{
-    color: white;
+    /* color: white; */
+    color : #a7a5a5;
 }
 .background-white .chapter-toc{
     /* color: black; */
     color: #4d4d4d;
+}
+.background-biege .chapter-toc{
+    /* color: black; */
+    color : rgba(93, 66, 50, 1);
 }
 
 .background-black .chapter-toc:not(:last-child){
@@ -694,6 +712,14 @@ Chapter content styling : common text styling and formatting across themes, add 
     float: right;
     text-align: right;
     font-size: 13px;
-    color: #000;
     opacity: .3;
+}
+.background-black .chapter-start-page{
+    color: #a7a5a5;
+}
+.background-white .chapter-start-page{
+    color: #4d4d4d;
+}
+.background-biege .chapter-start-page{
+    color : rgba(93, 66, 50, 1);
 }
