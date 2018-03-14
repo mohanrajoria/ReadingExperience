@@ -3,7 +3,7 @@ screenOverlayHandler({action : 'show', type : 'page-loading'});
 var __BASE_URL__ = "http://gateway.staging.juggernaut.in/",
     __USER_ID__ = "",
     __BOOK_ID__ = "",
-    __AUTH_TOKEN__ = "Bearer RLYTUIII12ADBF",
+    __AUTH_TOKEN__ = "",
     __CLIENT_NAME__ = "",
     __BOOK_TYPE__ = "commissioned";
 
