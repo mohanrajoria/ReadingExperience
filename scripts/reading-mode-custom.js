@@ -3,7 +3,7 @@ screenOverlayHandler({action : 'show', type : 'page-loading'});
 var __BASE_URL__ = "http://gateway.staging.juggernaut.in/",
     __USER_ID__ = "",
     __BOOK_ID__ = "",
-    __AUTH_TOKEN__ = "",
+    __AUTH_TOKEN__ = "Bearer RLYTUIII12ADBF",
     __CLIENT_NAME__ = "",
     __BOOK_TYPE__ = "commissioned";
 
@@ -695,9 +695,9 @@ function ajaxUrlGetter(dataObj) {
     } else if(dataObj.reqType === 'getPagesCommissioned') {
         reqUrl = __BASE_URL__ + "yatri/user/" + dataObj.userId + "/book/" + dataObj.bookId + "/read/pages/?" + dataObj.pageStr;
     } else if(dataObj.reqType === 'saveLastReadLocation'){
-        reqUrl = "http://staging.juggernaut.in/" + "yatri/user/" + dataObj.userId + "/book/" + dataObj.bookId + "/last-read-location/";
+        reqUrl = __BASE_URL__ + "yatri/user/" + dataObj.userId + "/book/" + dataObj.bookId + "/last-read-location/";
     } else if(dataObj.reqType === 'getPreviewChaptersCommissioned'){
-        reqUrl = "http://staging.juggernaut.in/" + "yatri/books/" + dataObj.bookId + "/preview/";
+        reqUrl = __BASE_URL__ + "yatri/books/" + dataObj.bookId + "/preview/";
     }
 
     return reqUrl;
